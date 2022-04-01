@@ -15,11 +15,10 @@
  */
 package org.springframework.security.oauth2.server.authorization.jackson2;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * This mixin class is used to serialize/deserialize {@link HashSet}.
@@ -31,8 +30,6 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS)
 abstract class HashSetMixin {
 
-	@JsonCreator
-	HashSetMixin(Set<?> set) {
-	}
-
+  @JsonCreator
+  HashSetMixin(Set<?> set) {}
 }

@@ -17,9 +17,9 @@ package org.springframework.security.oauth2.server.authorization.oidc.authentica
 
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.oauth2.core.AbstractOAuth2Token;
+import org.springframework.security.oauth2.core.OAuth2AuthorizationCode;
 import org.springframework.security.oauth2.core.OAuth2RefreshToken;
 import org.springframework.security.oauth2.server.authorization.OAuth2Authorization;
-import org.springframework.security.oauth2.core.OAuth2AuthorizationCode;
 
 /**
  * Utility methods for the OpenID Connect 1.0 {@link AuthenticationProvider}'s.
@@ -29,35 +29,34 @@ import org.springframework.security.oauth2.core.OAuth2AuthorizationCode;
  */
 final class OidcAuthenticationProviderUtils {
 
-	private OidcAuthenticationProviderUtils() {
-	}
+  private OidcAuthenticationProviderUtils() {}
 
-	static <T extends AbstractOAuth2Token> OAuth2Authorization invalidate(
-			OAuth2Authorization authorization, T token) {
+  static <T extends AbstractOAuth2Token> OAuth2Authorization invalidate(
+      OAuth2Authorization authorization, T token) {
 
-		// @formatter:off
-		OAuth2Authorization.Builder authorizationBuilder = OAuth2Authorization.from(authorization)
-				.token(token,
-						(metadata) ->
-								metadata.put(OAuth2Authorization.Token.INVALIDATED_METADATA_NAME, true));
+    // @formatter:off
+    OAuth2Authorization.Builder authorizationBuilder =
+        OAuth2Authorization.from(authorization)
+            .token(
+                token,
+                (metadata) ->
+                    metadata.put(OAuth2Authorization.Token.INVALIDATED_METADATA_NAME, true));
 
-		if (OAuth2RefreshToken.class.isAssignableFrom(token.getClass())) {
-			authorizationBuilder.token(
-					authorization.getAccessToken().getToken(),
-					(metadata) ->
-							metadata.put(OAuth2Authorization.Token.INVALIDATED_METADATA_NAME, true));
+    if (OAuth2RefreshToken.class.isAssignableFrom(token.getClass())) {
+      authorizationBuilder.token(
+          authorization.getAccessToken().getToken(),
+          (metadata) -> metadata.put(OAuth2Authorization.Token.INVALIDATED_METADATA_NAME, true));
 
-			OAuth2Authorization.Token<OAuth2AuthorizationCode> authorizationCode =
-					authorization.getToken(OAuth2AuthorizationCode.class);
-			if (authorizationCode != null && !authorizationCode.isInvalidated()) {
-				authorizationBuilder.token(
-						authorizationCode.getToken(),
-						(metadata) ->
-								metadata.put(OAuth2Authorization.Token.INVALIDATED_METADATA_NAME, true));
-			}
-		}
-		// @formatter:on
+      OAuth2Authorization.Token<OAuth2AuthorizationCode> authorizationCode =
+          authorization.getToken(OAuth2AuthorizationCode.class);
+      if (authorizationCode != null && !authorizationCode.isInvalidated()) {
+        authorizationBuilder.token(
+            authorizationCode.getToken(),
+            (metadata) -> metadata.put(OAuth2Authorization.Token.INVALIDATED_METADATA_NAME, true));
+      }
+    }
+    // @formatter:on
 
-		return authorizationBuilder.build();
-	}
+    return authorizationBuilder.build();
+  }
 }

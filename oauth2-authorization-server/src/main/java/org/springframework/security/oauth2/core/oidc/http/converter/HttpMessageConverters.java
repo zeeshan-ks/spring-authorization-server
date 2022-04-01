@@ -23,45 +23,43 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.util.ClassUtils;
 
 /**
- * TODO
- * This class is a straight copy from Spring Security.
- * It should be consolidated when merging this codebase into Spring Security.
+ * TODO This class is a straight copy from Spring Security. It should be consolidated when merging
+ * this codebase into Spring Security.
  *
- * Utility methods for {@link HttpMessageConverter}'s.
+ * <p>Utility methods for {@link HttpMessageConverter}'s.
  *
  * @author Joe Grandja
  * @since 5.1
  */
 final class HttpMessageConverters {
 
-	private static final boolean jackson2Present;
+  private static final boolean jackson2Present;
 
-	private static final boolean gsonPresent;
+  private static final boolean gsonPresent;
 
-	private static final boolean jsonbPresent;
+  private static final boolean jsonbPresent;
 
-	static {
-		ClassLoader classLoader = HttpMessageConverters.class.getClassLoader();
-		jackson2Present = ClassUtils.isPresent("com.fasterxml.jackson.databind.ObjectMapper", classLoader)
-				&& ClassUtils.isPresent("com.fasterxml.jackson.core.JsonGenerator", classLoader);
-		gsonPresent = ClassUtils.isPresent("com.google.gson.Gson", classLoader);
-		jsonbPresent = ClassUtils.isPresent("javax.json.bind.Jsonb", classLoader);
-	}
+  static {
+    ClassLoader classLoader = HttpMessageConverters.class.getClassLoader();
+    jackson2Present =
+        ClassUtils.isPresent("com.fasterxml.jackson.databind.ObjectMapper", classLoader)
+            && ClassUtils.isPresent("com.fasterxml.jackson.core.JsonGenerator", classLoader);
+    gsonPresent = ClassUtils.isPresent("com.google.gson.Gson", classLoader);
+    jsonbPresent = ClassUtils.isPresent("javax.json.bind.Jsonb", classLoader);
+  }
 
-	private HttpMessageConverters() {
-	}
+  private HttpMessageConverters() {}
 
-	static GenericHttpMessageConverter<Object> getJsonMessageConverter() {
-		if (jackson2Present) {
-			return new MappingJackson2HttpMessageConverter();
-		}
-		if (gsonPresent) {
-			return new GsonHttpMessageConverter();
-		}
-		if (jsonbPresent) {
-			return new JsonbHttpMessageConverter();
-		}
-		return null;
-	}
-
+  static GenericHttpMessageConverter<Object> getJsonMessageConverter() {
+    if (jackson2Present) {
+      return new MappingJackson2HttpMessageConverter();
+    }
+    if (gsonPresent) {
+      return new GsonHttpMessageConverter();
+    }
+    if (jsonbPresent) {
+      return new JsonbHttpMessageConverter();
+    }
+    return null;
+  }
 }

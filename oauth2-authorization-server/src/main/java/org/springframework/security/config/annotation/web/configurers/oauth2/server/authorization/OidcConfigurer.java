@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.ObjectPostProcessor;
@@ -42,96 +41,105 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
  * @see OidcProviderConfigurationEndpointFilter
  */
 public final class OidcConfigurer extends AbstractOAuth2Configurer {
-	private final Map<Class<? extends AbstractOAuth2Configurer>, AbstractOAuth2Configurer> configurers = new LinkedHashMap<>();
-	private RequestMatcher requestMatcher;
+  private final Map<Class<? extends AbstractOAuth2Configurer>, AbstractOAuth2Configurer>
+      configurers = new LinkedHashMap<>();
+  private RequestMatcher requestMatcher;
 
-	/**
-	 * Restrict for internal use only.
-	 */
-	OidcConfigurer(ObjectPostProcessor<Object> objectPostProcessor) {
-		super(objectPostProcessor);
-		addConfigurer(OidcUserInfoEndpointConfigurer.class, new OidcUserInfoEndpointConfigurer(objectPostProcessor));
-	}
+  /** Restrict for internal use only. */
+  OidcConfigurer(ObjectPostProcessor<Object> objectPostProcessor) {
+    super(objectPostProcessor);
+    addConfigurer(
+        OidcUserInfoEndpointConfigurer.class,
+        new OidcUserInfoEndpointConfigurer(objectPostProcessor));
+  }
 
-	/**
-	 * Configures the OpenID Connect Dynamic Client Registration 1.0 Endpoint.
-	 *
-	 * @param clientRegistrationEndpointCustomizer the {@link Customizer} providing access to the {@link OidcClientRegistrationEndpointConfigurer}
-	 * @return the {@link OidcConfigurer} for further configuration
-	 */
-	public OidcConfigurer clientRegistrationEndpoint(Customizer<OidcClientRegistrationEndpointConfigurer> clientRegistrationEndpointCustomizer) {
-		OidcClientRegistrationEndpointConfigurer clientRegistrationEndpointConfigurer =
-				getConfigurer(OidcClientRegistrationEndpointConfigurer.class);
-		if (clientRegistrationEndpointConfigurer == null) {
-			addConfigurer(OidcClientRegistrationEndpointConfigurer.class,
-					new OidcClientRegistrationEndpointConfigurer(getObjectPostProcessor()));
-			clientRegistrationEndpointConfigurer = getConfigurer(OidcClientRegistrationEndpointConfigurer.class);
-		}
-		clientRegistrationEndpointCustomizer.customize(clientRegistrationEndpointConfigurer);
-		return this;
-	}
+  /**
+   * Configures the OpenID Connect Dynamic Client Registration 1.0 Endpoint.
+   *
+   * @param clientRegistrationEndpointCustomizer the {@link Customizer} providing access to the
+   *     {@link OidcClientRegistrationEndpointConfigurer}
+   * @return the {@link OidcConfigurer} for further configuration
+   */
+  public OidcConfigurer clientRegistrationEndpoint(
+      Customizer<OidcClientRegistrationEndpointConfigurer> clientRegistrationEndpointCustomizer) {
+    OidcClientRegistrationEndpointConfigurer clientRegistrationEndpointConfigurer =
+        getConfigurer(OidcClientRegistrationEndpointConfigurer.class);
+    if (clientRegistrationEndpointConfigurer == null) {
+      addConfigurer(
+          OidcClientRegistrationEndpointConfigurer.class,
+          new OidcClientRegistrationEndpointConfigurer(getObjectPostProcessor()));
+      clientRegistrationEndpointConfigurer =
+          getConfigurer(OidcClientRegistrationEndpointConfigurer.class);
+    }
+    clientRegistrationEndpointCustomizer.customize(clientRegistrationEndpointConfigurer);
+    return this;
+  }
 
-	/**
-	 * Configures the OpenID Connect 1.0 UserInfo Endpoint.
-	 *
-	 * @param userInfoEndpointCustomizer the {@link Customizer} providing access to the {@link OidcUserInfoEndpointConfigurer}
-	 * @return the {@link OidcConfigurer} for further configuration
-	 */
-	public OidcConfigurer userInfoEndpoint(Customizer<OidcUserInfoEndpointConfigurer> userInfoEndpointCustomizer) {
-		userInfoEndpointCustomizer.customize(getConfigurer(OidcUserInfoEndpointConfigurer.class));
-		return this;
-	}
+  /**
+   * Configures the OpenID Connect 1.0 UserInfo Endpoint.
+   *
+   * @param userInfoEndpointCustomizer the {@link Customizer} providing access to the {@link
+   *     OidcUserInfoEndpointConfigurer}
+   * @return the {@link OidcConfigurer} for further configuration
+   */
+  public OidcConfigurer userInfoEndpoint(
+      Customizer<OidcUserInfoEndpointConfigurer> userInfoEndpointCustomizer) {
+    userInfoEndpointCustomizer.customize(getConfigurer(OidcUserInfoEndpointConfigurer.class));
+    return this;
+  }
 
-	@Override
-	<B extends HttpSecurityBuilder<B>> void init(B builder) {
-		OidcUserInfoEndpointConfigurer userInfoEndpointConfigurer =
-				getConfigurer(OidcUserInfoEndpointConfigurer.class);
-		userInfoEndpointConfigurer.init(builder);
-		OidcClientRegistrationEndpointConfigurer clientRegistrationEndpointConfigurer =
-				getConfigurer(OidcClientRegistrationEndpointConfigurer.class);
-		if (clientRegistrationEndpointConfigurer != null) {
-			clientRegistrationEndpointConfigurer.init(builder);
-		}
+  @Override
+  <B extends HttpSecurityBuilder<B>> void init(B builder) {
+    OidcUserInfoEndpointConfigurer userInfoEndpointConfigurer =
+        getConfigurer(OidcUserInfoEndpointConfigurer.class);
+    userInfoEndpointConfigurer.init(builder);
+    OidcClientRegistrationEndpointConfigurer clientRegistrationEndpointConfigurer =
+        getConfigurer(OidcClientRegistrationEndpointConfigurer.class);
+    if (clientRegistrationEndpointConfigurer != null) {
+      clientRegistrationEndpointConfigurer.init(builder);
+    }
 
-		List<RequestMatcher> requestMatchers = new ArrayList<>();
-		requestMatchers.add(new AntPathRequestMatcher(
-				"/.well-known/openid-configuration", HttpMethod.GET.name()));
-		requestMatchers.add(userInfoEndpointConfigurer.getRequestMatcher());
-		if (clientRegistrationEndpointConfigurer != null) {
-			requestMatchers.add(clientRegistrationEndpointConfigurer.getRequestMatcher());
-		}
-		this.requestMatcher = new OrRequestMatcher(requestMatchers);
-	}
+    List<RequestMatcher> requestMatchers = new ArrayList<>();
+    requestMatchers.add(
+        new AntPathRequestMatcher("/.well-known/openid-configuration", HttpMethod.GET.name()));
+    requestMatchers.add(userInfoEndpointConfigurer.getRequestMatcher());
+    if (clientRegistrationEndpointConfigurer != null) {
+      requestMatchers.add(clientRegistrationEndpointConfigurer.getRequestMatcher());
+    }
+    this.requestMatcher = new OrRequestMatcher(requestMatchers);
+  }
 
-	@Override
-	<B extends HttpSecurityBuilder<B>> void configure(B builder) {
-		OidcUserInfoEndpointConfigurer userInfoEndpointConfigurer =
-				getConfigurer(OidcUserInfoEndpointConfigurer.class);
-		userInfoEndpointConfigurer.configure(builder);
-		OidcClientRegistrationEndpointConfigurer clientRegistrationEndpointConfigurer =
-				getConfigurer(OidcClientRegistrationEndpointConfigurer.class);
-		if (clientRegistrationEndpointConfigurer != null) {
-			clientRegistrationEndpointConfigurer.configure(builder);
-		}
+  @Override
+  <B extends HttpSecurityBuilder<B>> void configure(B builder) {
+    OidcUserInfoEndpointConfigurer userInfoEndpointConfigurer =
+        getConfigurer(OidcUserInfoEndpointConfigurer.class);
+    userInfoEndpointConfigurer.configure(builder);
+    OidcClientRegistrationEndpointConfigurer clientRegistrationEndpointConfigurer =
+        getConfigurer(OidcClientRegistrationEndpointConfigurer.class);
+    if (clientRegistrationEndpointConfigurer != null) {
+      clientRegistrationEndpointConfigurer.configure(builder);
+    }
 
-		ProviderSettings providerSettings = OAuth2ConfigurerUtils.getProviderSettings(builder);
-		OidcProviderConfigurationEndpointFilter oidcProviderConfigurationEndpointFilter =
-				new OidcProviderConfigurationEndpointFilter(providerSettings);
-		builder.addFilterBefore(postProcess(oidcProviderConfigurationEndpointFilter), AbstractPreAuthenticatedProcessingFilter.class);
-	}
+    ProviderSettings providerSettings = OAuth2ConfigurerUtils.getProviderSettings(builder);
+    OidcProviderConfigurationEndpointFilter oidcProviderConfigurationEndpointFilter =
+        new OidcProviderConfigurationEndpointFilter(providerSettings);
+    builder.addFilterBefore(
+        postProcess(oidcProviderConfigurationEndpointFilter),
+        AbstractPreAuthenticatedProcessingFilter.class);
+  }
 
-	@Override
-	RequestMatcher getRequestMatcher() {
-		return this.requestMatcher;
-	}
+  @Override
+  RequestMatcher getRequestMatcher() {
+    return this.requestMatcher;
+  }
 
-	@SuppressWarnings("unchecked")
-	<T> T getConfigurer(Class<T> type) {
-		return (T) this.configurers.get(type);
-	}
+  @SuppressWarnings("unchecked")
+  <T> T getConfigurer(Class<T> type) {
+    return (T) this.configurers.get(type);
+  }
 
-	private <T extends AbstractOAuth2Configurer> void addConfigurer(Class<T> configurerType, T configurer) {
-		this.configurers.put(configurerType, configurer);
-	}
-
+  private <T extends AbstractOAuth2Configurer> void addConfigurer(
+      Class<T> configurerType, T configurer) {
+    this.configurers.put(configurerType, configurer);
+  }
 }

@@ -43,69 +43,72 @@ import org.springframework.util.Assert;
  * @see JwtClientAssertionAuthenticationProvider
  * @see ClientSecretAuthenticationProvider
  * @see PublicClientAuthenticationProvider
- * @deprecated This implementation is decomposed into {@link JwtClientAssertionAuthenticationProvider},
- * {@link ClientSecretAuthenticationProvider} and {@link PublicClientAuthenticationProvider}.
+ * @deprecated This implementation is decomposed into {@link
+ *     JwtClientAssertionAuthenticationProvider}, {@link ClientSecretAuthenticationProvider} and
+ *     {@link PublicClientAuthenticationProvider}.
  */
 @Deprecated
 public final class OAuth2ClientAuthenticationProvider implements AuthenticationProvider {
-	private static final ClientAuthenticationMethod JWT_CLIENT_ASSERTION_AUTHENTICATION_METHOD =
-			new ClientAuthenticationMethod("urn:ietf:params:oauth:client-assertion-type:jwt-bearer");
-	private final JwtClientAssertionAuthenticationProvider jwtClientAssertionAuthenticationProvider;
-	private final ClientSecretAuthenticationProvider clientSecretAuthenticationProvider;
-	private final PublicClientAuthenticationProvider publicClientAuthenticationProvider;
+  private static final ClientAuthenticationMethod JWT_CLIENT_ASSERTION_AUTHENTICATION_METHOD =
+      new ClientAuthenticationMethod("urn:ietf:params:oauth:client-assertion-type:jwt-bearer");
+  private final JwtClientAssertionAuthenticationProvider jwtClientAssertionAuthenticationProvider;
+  private final ClientSecretAuthenticationProvider clientSecretAuthenticationProvider;
+  private final PublicClientAuthenticationProvider publicClientAuthenticationProvider;
 
-	/**
-	 * Constructs an {@code OAuth2ClientAuthenticationProvider} using the provided parameters.
-	 *
-	 * @param registeredClientRepository the repository of registered clients
-	 * @param authorizationService the authorization service
-	 */
-	public OAuth2ClientAuthenticationProvider(RegisteredClientRepository registeredClientRepository,
-			OAuth2AuthorizationService authorizationService) {
-		Assert.notNull(registeredClientRepository, "registeredClientRepository cannot be null");
-		Assert.notNull(authorizationService, "authorizationService cannot be null");
-		this.jwtClientAssertionAuthenticationProvider = new JwtClientAssertionAuthenticationProvider(
-				registeredClientRepository, authorizationService);
-		this.clientSecretAuthenticationProvider = new ClientSecretAuthenticationProvider(
-				registeredClientRepository, authorizationService);
-		this.publicClientAuthenticationProvider = new PublicClientAuthenticationProvider(
-				registeredClientRepository, authorizationService);
-	}
+  /**
+   * Constructs an {@code OAuth2ClientAuthenticationProvider} using the provided parameters.
+   *
+   * @param registeredClientRepository the repository of registered clients
+   * @param authorizationService the authorization service
+   */
+  public OAuth2ClientAuthenticationProvider(
+      RegisteredClientRepository registeredClientRepository,
+      OAuth2AuthorizationService authorizationService) {
+    Assert.notNull(registeredClientRepository, "registeredClientRepository cannot be null");
+    Assert.notNull(authorizationService, "authorizationService cannot be null");
+    this.jwtClientAssertionAuthenticationProvider =
+        new JwtClientAssertionAuthenticationProvider(
+            registeredClientRepository, authorizationService);
+    this.clientSecretAuthenticationProvider =
+        new ClientSecretAuthenticationProvider(registeredClientRepository, authorizationService);
+    this.publicClientAuthenticationProvider =
+        new PublicClientAuthenticationProvider(registeredClientRepository, authorizationService);
+  }
 
-	/**
-	 * Sets the {@link PasswordEncoder} used to validate
-	 * the {@link RegisteredClient#getClientSecret() client secret}.
-	 * If not set, the client secret will be compared using
-	 * {@link PasswordEncoderFactories#createDelegatingPasswordEncoder()}.
-	 *
-	 * @param passwordEncoder the {@link PasswordEncoder} used to validate the client secret
-	 */
-	public void setPasswordEncoder(PasswordEncoder passwordEncoder) {
-		this.clientSecretAuthenticationProvider.setPasswordEncoder(passwordEncoder);
-	}
+  /**
+   * Sets the {@link PasswordEncoder} used to validate the {@link RegisteredClient#getClientSecret()
+   * client secret}. If not set, the client secret will be compared using {@link
+   * PasswordEncoderFactories#createDelegatingPasswordEncoder()}.
+   *
+   * @param passwordEncoder the {@link PasswordEncoder} used to validate the client secret
+   */
+  public void setPasswordEncoder(PasswordEncoder passwordEncoder) {
+    this.clientSecretAuthenticationProvider.setPasswordEncoder(passwordEncoder);
+  }
 
-	@Autowired
-	protected void setProviderSettings(ProviderSettings providerSettings) {
-	}
+  @Autowired
+  protected void setProviderSettings(ProviderSettings providerSettings) {}
 
-	@Override
-	public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-		OAuth2ClientAuthenticationToken clientAuthentication =
-				(OAuth2ClientAuthenticationToken) authentication;
+  @Override
+  public Authentication authenticate(Authentication authentication) throws AuthenticationException {
+    OAuth2ClientAuthenticationToken clientAuthentication =
+        (OAuth2ClientAuthenticationToken) authentication;
 
-		if (JWT_CLIENT_ASSERTION_AUTHENTICATION_METHOD.equals(clientAuthentication.getClientAuthenticationMethod())) {
-			return this.jwtClientAssertionAuthenticationProvider.authenticate(authentication);
-		} else if (ClientAuthenticationMethod.CLIENT_SECRET_BASIC.equals(clientAuthentication.getClientAuthenticationMethod()) ||
-				ClientAuthenticationMethod.CLIENT_SECRET_POST.equals(clientAuthentication.getClientAuthenticationMethod())) {
-			return this.clientSecretAuthenticationProvider.authenticate(authentication);
-		} else {
-			return this.publicClientAuthenticationProvider.authenticate(authentication);
-		}
-	}
+    if (JWT_CLIENT_ASSERTION_AUTHENTICATION_METHOD.equals(
+        clientAuthentication.getClientAuthenticationMethod())) {
+      return this.jwtClientAssertionAuthenticationProvider.authenticate(authentication);
+    } else if (ClientAuthenticationMethod.CLIENT_SECRET_BASIC.equals(
+            clientAuthentication.getClientAuthenticationMethod())
+        || ClientAuthenticationMethod.CLIENT_SECRET_POST.equals(
+            clientAuthentication.getClientAuthenticationMethod())) {
+      return this.clientSecretAuthenticationProvider.authenticate(authentication);
+    } else {
+      return this.publicClientAuthenticationProvider.authenticate(authentication);
+    }
+  }
 
-	@Override
-	public boolean supports(Class<?> authentication) {
-		return OAuth2ClientAuthenticationToken.class.isAssignableFrom(authentication);
-	}
-
+  @Override
+  public boolean supports(Class<?> authentication) {
+    return OAuth2ClientAuthenticationToken.class.isAssignableFrom(authentication);
+  }
 }

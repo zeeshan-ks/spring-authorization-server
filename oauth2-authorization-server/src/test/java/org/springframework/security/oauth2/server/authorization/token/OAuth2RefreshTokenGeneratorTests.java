@@ -15,17 +15,15 @@
  */
 package org.springframework.security.oauth2.server.authorization.token;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.time.Instant;
-
 import org.junit.Test;
-
 import org.springframework.security.oauth2.core.OAuth2RefreshToken;
 import org.springframework.security.oauth2.core.OAuth2TokenType;
 import org.springframework.security.oauth2.server.authorization.OAuth2TokenContext;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
 import org.springframework.security.oauth2.server.authorization.client.TestRegisteredClients;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests for {@link OAuth2RefreshTokenGenerator}.
@@ -33,37 +31,40 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Joe Grandja
  */
 public class OAuth2RefreshTokenGeneratorTests {
-	private final OAuth2RefreshTokenGenerator tokenGenerator = new OAuth2RefreshTokenGenerator();
+  private final OAuth2RefreshTokenGenerator tokenGenerator = new OAuth2RefreshTokenGenerator();
 
-	@Test
-	public void generateWhenUnsupportedTokenTypeThenReturnNull() {
-		// @formatter:off
-		OAuth2TokenContext tokenContext = DefaultOAuth2TokenContext.builder()
-				.tokenType(OAuth2TokenType.ACCESS_TOKEN)
-				.build();
-		// @formatter:on
+  @Test
+  public void generateWhenUnsupportedTokenTypeThenReturnNull() {
+    // @formatter:off
+    OAuth2TokenContext tokenContext =
+        DefaultOAuth2TokenContext.builder().tokenType(OAuth2TokenType.ACCESS_TOKEN).build();
+    // @formatter:on
 
-		assertThat(this.tokenGenerator.generate(tokenContext)).isNull();
-	}
+    assertThat(this.tokenGenerator.generate(tokenContext)).isNull();
+  }
 
-	@Test
-	public void generateWhenRefreshTokenTypeThenReturnRefreshToken() {
-		RegisteredClient registeredClient = TestRegisteredClients.registeredClient().build();
+  @Test
+  public void generateWhenRefreshTokenTypeThenReturnRefreshToken() {
+    RegisteredClient registeredClient = TestRegisteredClients.registeredClient().build();
 
-		// @formatter:off
-		OAuth2TokenContext tokenContext = DefaultOAuth2TokenContext.builder()
-				.registeredClient(registeredClient)
-				.tokenType(OAuth2TokenType.REFRESH_TOKEN)
-				.build();
-		// @formatter:on
+    // @formatter:off
+    OAuth2TokenContext tokenContext =
+        DefaultOAuth2TokenContext.builder()
+            .registeredClient(registeredClient)
+            .tokenType(OAuth2TokenType.REFRESH_TOKEN)
+            .build();
+    // @formatter:on
 
-		OAuth2RefreshToken refreshToken = this.tokenGenerator.generate(tokenContext);
-		assertThat(refreshToken).isNotNull();
+    OAuth2RefreshToken refreshToken = this.tokenGenerator.generate(tokenContext);
+    assertThat(refreshToken).isNotNull();
 
-		Instant issuedAt = Instant.now();
-		Instant expiresAt = issuedAt.plus(tokenContext.getRegisteredClient().getTokenSettings().getRefreshTokenTimeToLive());
-		assertThat(refreshToken.getIssuedAt()).isBetween(issuedAt.minusSeconds(1), issuedAt.plusSeconds(1));
-		assertThat(refreshToken.getExpiresAt()).isBetween(expiresAt.minusSeconds(1), expiresAt.plusSeconds(1));
-	}
-
+    Instant issuedAt = Instant.now();
+    Instant expiresAt =
+        issuedAt.plus(
+            tokenContext.getRegisteredClient().getTokenSettings().getRefreshTokenTimeToLive());
+    assertThat(refreshToken.getIssuedAt())
+        .isBetween(issuedAt.minusSeconds(1), issuedAt.plusSeconds(1));
+    assertThat(refreshToken.getExpiresAt())
+        .isBetween(expiresAt.minusSeconds(1), expiresAt.plusSeconds(1));
+  }
 }

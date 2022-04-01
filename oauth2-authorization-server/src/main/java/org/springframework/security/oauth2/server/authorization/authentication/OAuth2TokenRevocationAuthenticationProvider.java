@@ -15,6 +15,8 @@
  */
 package org.springframework.security.oauth2.server.authorization.authentication;
 
+import static org.springframework.security.oauth2.server.authorization.authentication.OAuth2AuthenticationProviderUtils.getAuthenticatedClientElseThrowInvalidClient;
+
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -26,8 +28,6 @@ import org.springframework.security.oauth2.server.authorization.OAuth2Authorizat
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
 import org.springframework.util.Assert;
 
-import static org.springframework.security.oauth2.server.authorization.authentication.OAuth2AuthenticationProviderUtils.getAuthenticatedClientElseThrowInvalidClient;
-
 /**
  * An {@link AuthenticationProvider} implementation for OAuth 2.0 Token Revocation.
  *
@@ -36,50 +36,54 @@ import static org.springframework.security.oauth2.server.authorization.authentic
  * @since 0.0.3
  * @see OAuth2TokenRevocationAuthenticationToken
  * @see OAuth2AuthorizationService
- * @see <a target="_blank" href="https://tools.ietf.org/html/rfc7009#section-2.1">Section 2.1 Revocation Request</a>
+ * @see <a target="_blank" href="https://tools.ietf.org/html/rfc7009#section-2.1">Section 2.1
+ *     Revocation Request</a>
  */
 public final class OAuth2TokenRevocationAuthenticationProvider implements AuthenticationProvider {
-	private final OAuth2AuthorizationService authorizationService;
+  private final OAuth2AuthorizationService authorizationService;
 
-	/**
-	 * Constructs an {@code OAuth2TokenRevocationAuthenticationProvider} using the provided parameters.
-	 *
-	 * @param authorizationService the authorization service
-	 */
-	public OAuth2TokenRevocationAuthenticationProvider(OAuth2AuthorizationService authorizationService) {
-		Assert.notNull(authorizationService, "authorizationService cannot be null");
-		this.authorizationService = authorizationService;
-	}
+  /**
+   * Constructs an {@code OAuth2TokenRevocationAuthenticationProvider} using the provided
+   * parameters.
+   *
+   * @param authorizationService the authorization service
+   */
+  public OAuth2TokenRevocationAuthenticationProvider(
+      OAuth2AuthorizationService authorizationService) {
+    Assert.notNull(authorizationService, "authorizationService cannot be null");
+    this.authorizationService = authorizationService;
+  }
 
-	@Override
-	public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-		OAuth2TokenRevocationAuthenticationToken tokenRevocationAuthentication =
-				(OAuth2TokenRevocationAuthenticationToken) authentication;
+  @Override
+  public Authentication authenticate(Authentication authentication) throws AuthenticationException {
+    OAuth2TokenRevocationAuthenticationToken tokenRevocationAuthentication =
+        (OAuth2TokenRevocationAuthenticationToken) authentication;
 
-		OAuth2ClientAuthenticationToken clientPrincipal =
-				getAuthenticatedClientElseThrowInvalidClient(tokenRevocationAuthentication);
-		RegisteredClient registeredClient = clientPrincipal.getRegisteredClient();
+    OAuth2ClientAuthenticationToken clientPrincipal =
+        getAuthenticatedClientElseThrowInvalidClient(tokenRevocationAuthentication);
+    RegisteredClient registeredClient = clientPrincipal.getRegisteredClient();
 
-		OAuth2Authorization authorization = this.authorizationService.findByToken(
-				tokenRevocationAuthentication.getToken(), null);
-		if (authorization == null) {
-			// Return the authentication request when token not found
-			return tokenRevocationAuthentication;
-		}
+    OAuth2Authorization authorization =
+        this.authorizationService.findByToken(tokenRevocationAuthentication.getToken(), null);
+    if (authorization == null) {
+      // Return the authentication request when token not found
+      return tokenRevocationAuthentication;
+    }
 
-		if (!registeredClient.getId().equals(authorization.getRegisteredClientId())) {
-			throw new OAuth2AuthenticationException(OAuth2ErrorCodes.INVALID_CLIENT);
-		}
+    if (!registeredClient.getId().equals(authorization.getRegisteredClientId())) {
+      throw new OAuth2AuthenticationException(OAuth2ErrorCodes.INVALID_CLIENT);
+    }
 
-		OAuth2Authorization.Token<AbstractOAuth2Token> token = authorization.getToken(tokenRevocationAuthentication.getToken());
-		authorization = OAuth2AuthenticationProviderUtils.invalidate(authorization, token.getToken());
-		this.authorizationService.save(authorization);
+    OAuth2Authorization.Token<AbstractOAuth2Token> token =
+        authorization.getToken(tokenRevocationAuthentication.getToken());
+    authorization = OAuth2AuthenticationProviderUtils.invalidate(authorization, token.getToken());
+    this.authorizationService.save(authorization);
 
-		return new OAuth2TokenRevocationAuthenticationToken(token.getToken(), clientPrincipal);
-	}
+    return new OAuth2TokenRevocationAuthenticationToken(token.getToken(), clientPrincipal);
+  }
 
-	@Override
-	public boolean supports(Class<?> authentication) {
-		return OAuth2TokenRevocationAuthenticationToken.class.isAssignableFrom(authentication);
-	}
+  @Override
+  public boolean supports(Class<?> authentication) {
+    return OAuth2TokenRevocationAuthenticationToken.class.isAssignableFrom(authentication);
+  }
 }

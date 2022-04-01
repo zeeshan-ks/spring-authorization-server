@@ -16,21 +16,19 @@
 
 package org.springframework.security.config.annotation.web.configuration;
 
-import java.util.function.Supplier;
-
-import org.junit.Test;
-import org.mockito.ArgumentCaptor;
-
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.beans.factory.support.BeanDefinitionRegistry;
-import org.springframework.beans.factory.support.DefaultListableBeanFactory;
-import org.springframework.beans.factory.support.RootBeanDefinition;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.endsWith;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
+
+import java.util.function.Supplier;
+import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
+import org.springframework.beans.factory.support.RootBeanDefinition;
 
 /**
  * Tests for {@link RegisterMissingBeanPostProcessor}.
@@ -38,73 +36,76 @@ import static org.mockito.Mockito.verifyNoInteractions;
  * @author Steve Riesenberg
  */
 public class RegisterMissingBeanPostProcessorTests {
-	private final RegisterMissingBeanPostProcessor postProcessor = new RegisterMissingBeanPostProcessor();
+  private final RegisterMissingBeanPostProcessor postProcessor =
+      new RegisterMissingBeanPostProcessor();
 
-	@Test
-	public void postProcessBeanDefinitionRegistryWhenClassAddedThenRegisteredWithClass() {
-		this.postProcessor.addBeanDefinition(SimpleBean.class, null);
-		this.postProcessor.setBeanFactory(new DefaultListableBeanFactory());
+  @Test
+  public void postProcessBeanDefinitionRegistryWhenClassAddedThenRegisteredWithClass() {
+    this.postProcessor.addBeanDefinition(SimpleBean.class, null);
+    this.postProcessor.setBeanFactory(new DefaultListableBeanFactory());
 
-		BeanDefinitionRegistry beanDefinitionRegistry = mock(BeanDefinitionRegistry.class);
-		this.postProcessor.postProcessBeanDefinitionRegistry(beanDefinitionRegistry);
+    BeanDefinitionRegistry beanDefinitionRegistry = mock(BeanDefinitionRegistry.class);
+    this.postProcessor.postProcessBeanDefinitionRegistry(beanDefinitionRegistry);
 
-		ArgumentCaptor<BeanDefinition> beanDefinitionCaptor = ArgumentCaptor.forClass(BeanDefinition.class);
-		verify(beanDefinitionRegistry).registerBeanDefinition(endsWith("SimpleBean"), beanDefinitionCaptor.capture());
+    ArgumentCaptor<BeanDefinition> beanDefinitionCaptor =
+        ArgumentCaptor.forClass(BeanDefinition.class);
+    verify(beanDefinitionRegistry)
+        .registerBeanDefinition(endsWith("SimpleBean"), beanDefinitionCaptor.capture());
 
-		RootBeanDefinition beanDefinition = (RootBeanDefinition) beanDefinitionCaptor.getValue();
-		assertThat(beanDefinition.getBeanClass()).isEqualTo(SimpleBean.class);
-		assertThat(beanDefinition.getInstanceSupplier()).isNull();
-	}
+    RootBeanDefinition beanDefinition = (RootBeanDefinition) beanDefinitionCaptor.getValue();
+    assertThat(beanDefinition.getBeanClass()).isEqualTo(SimpleBean.class);
+    assertThat(beanDefinition.getInstanceSupplier()).isNull();
+  }
 
-	@Test
-	public void postProcessBeanDefinitionRegistryWhenSupplierAddedThenRegisteredWithSupplier() {
-		Supplier<SimpleBean> beanSupplier = () -> new SimpleBean("string");
-		this.postProcessor.addBeanDefinition(SimpleBean.class, beanSupplier);
-		this.postProcessor.setBeanFactory(new DefaultListableBeanFactory());
+  @Test
+  public void postProcessBeanDefinitionRegistryWhenSupplierAddedThenRegisteredWithSupplier() {
+    Supplier<SimpleBean> beanSupplier = () -> new SimpleBean("string");
+    this.postProcessor.addBeanDefinition(SimpleBean.class, beanSupplier);
+    this.postProcessor.setBeanFactory(new DefaultListableBeanFactory());
 
-		BeanDefinitionRegistry beanDefinitionRegistry = mock(BeanDefinitionRegistry.class);
-		this.postProcessor.postProcessBeanDefinitionRegistry(beanDefinitionRegistry);
+    BeanDefinitionRegistry beanDefinitionRegistry = mock(BeanDefinitionRegistry.class);
+    this.postProcessor.postProcessBeanDefinitionRegistry(beanDefinitionRegistry);
 
-		ArgumentCaptor<BeanDefinition> beanDefinitionCaptor = ArgumentCaptor.forClass(BeanDefinition.class);
-		verify(beanDefinitionRegistry).registerBeanDefinition(endsWith("SimpleBean"), beanDefinitionCaptor.capture());
+    ArgumentCaptor<BeanDefinition> beanDefinitionCaptor =
+        ArgumentCaptor.forClass(BeanDefinition.class);
+    verify(beanDefinitionRegistry)
+        .registerBeanDefinition(endsWith("SimpleBean"), beanDefinitionCaptor.capture());
 
-		RootBeanDefinition beanDefinition = (RootBeanDefinition) beanDefinitionCaptor.getValue();
-		assertThat(beanDefinition.getBeanClass()).isEqualTo(SimpleBean.class);
-		assertThat(beanDefinition.getInstanceSupplier()).isEqualTo(beanSupplier);
-	}
+    RootBeanDefinition beanDefinition = (RootBeanDefinition) beanDefinitionCaptor.getValue();
+    assertThat(beanDefinition.getBeanClass()).isEqualTo(SimpleBean.class);
+    assertThat(beanDefinition.getInstanceSupplier()).isEqualTo(beanSupplier);
+  }
 
-	@Test
-	public void postProcessBeanDefinitionRegistryWhenNoBeanDefinitionsAddedThenNoneRegistered() {
-		this.postProcessor.setBeanFactory(new DefaultListableBeanFactory());
+  @Test
+  public void postProcessBeanDefinitionRegistryWhenNoBeanDefinitionsAddedThenNoneRegistered() {
+    this.postProcessor.setBeanFactory(new DefaultListableBeanFactory());
 
-		BeanDefinitionRegistry beanDefinitionRegistry = mock(BeanDefinitionRegistry.class);
-		this.postProcessor.postProcessBeanDefinitionRegistry(beanDefinitionRegistry);
-		verifyNoInteractions(beanDefinitionRegistry);
-	}
+    BeanDefinitionRegistry beanDefinitionRegistry = mock(BeanDefinitionRegistry.class);
+    this.postProcessor.postProcessBeanDefinitionRegistry(beanDefinitionRegistry);
+    verifyNoInteractions(beanDefinitionRegistry);
+  }
 
-	@Test
-	public void postProcessBeanDefinitionRegistryWhenBeanDefinitionAlreadyExistsThenNoneRegistered() {
-		this.postProcessor.addBeanDefinition(SimpleBean.class, null);
-		DefaultListableBeanFactory beanFactory = new DefaultListableBeanFactory();
-		beanFactory.registerBeanDefinition("simpleBean", new RootBeanDefinition(SimpleBean.class));
-		this.postProcessor.setBeanFactory(beanFactory);
+  @Test
+  public void postProcessBeanDefinitionRegistryWhenBeanDefinitionAlreadyExistsThenNoneRegistered() {
+    this.postProcessor.addBeanDefinition(SimpleBean.class, null);
+    DefaultListableBeanFactory beanFactory = new DefaultListableBeanFactory();
+    beanFactory.registerBeanDefinition("simpleBean", new RootBeanDefinition(SimpleBean.class));
+    this.postProcessor.setBeanFactory(beanFactory);
 
-		BeanDefinitionRegistry beanDefinitionRegistry = mock(BeanDefinitionRegistry.class);
-		this.postProcessor.postProcessBeanDefinitionRegistry(beanDefinitionRegistry);
-		verifyNoInteractions(beanDefinitionRegistry);
-	}
+    BeanDefinitionRegistry beanDefinitionRegistry = mock(BeanDefinitionRegistry.class);
+    this.postProcessor.postProcessBeanDefinitionRegistry(beanDefinitionRegistry);
+    verifyNoInteractions(beanDefinitionRegistry);
+  }
 
-	private static final class SimpleBean {
-		private final String field;
+  private static final class SimpleBean {
+    private final String field;
 
-		private SimpleBean(String field) {
-			this.field = field;
-		}
+    private SimpleBean(String field) {
+      this.field = field;
+    }
 
-		private String getField() {
-			return field;
-		}
-
-	}
-
+    private String getField() {
+      return field;
+    }
+  }
 }

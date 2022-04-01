@@ -15,14 +15,13 @@
  */
 package org.springframework.security.oauth2.server.authorization.token;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Collections;
-
 import org.junit.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * Tests for {@link OAuth2TokenClaimsSet}.
@@ -31,67 +30,70 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  */
 public class OAuth2TokenClaimsSetTests {
 
-	@Test
-	public void buildWhenClaimsEmptyThenThrowIllegalArgumentException() {
-		assertThatThrownBy(() -> OAuth2TokenClaimsSet.builder().build())
-				.isInstanceOf(IllegalArgumentException.class)
-				.hasMessage("claims cannot be empty");
-	}
+  @Test
+  public void buildWhenClaimsEmptyThenThrowIllegalArgumentException() {
+    assertThatThrownBy(() -> OAuth2TokenClaimsSet.builder().build())
+        .isInstanceOf(IllegalArgumentException.class)
+        .hasMessage("claims cannot be empty");
+  }
 
-	@Test
-	public void buildWhenAllClaimsProvidedThenAllClaimsAreSet() {
-		Instant issuedAt = Instant.now();
-		Instant expiresAt = issuedAt.plus(1, ChronoUnit.HOURS);
-		String customClaimName = "custom-claim-name";
-		String customClaimValue = "custom-claim-value";
+  @Test
+  public void buildWhenAllClaimsProvidedThenAllClaimsAreSet() {
+    Instant issuedAt = Instant.now();
+    Instant expiresAt = issuedAt.plus(1, ChronoUnit.HOURS);
+    String customClaimName = "custom-claim-name";
+    String customClaimValue = "custom-claim-value";
 
-		// @formatter:off
-		OAuth2TokenClaimsSet expectedClaimsSet = OAuth2TokenClaimsSet.builder()
-				.issuer("https://provider.com")
-				.subject("subject")
-				.audience(Collections.singletonList("client-1"))
-				.issuedAt(issuedAt)
-				.notBefore(issuedAt)
-				.expiresAt(expiresAt)
-				.id("id")
-				.claims(claims -> claims.put(customClaimName, customClaimValue))
-				.build();
+    // @formatter:off
+    OAuth2TokenClaimsSet expectedClaimsSet =
+        OAuth2TokenClaimsSet.builder()
+            .issuer("https://provider.com")
+            .subject("subject")
+            .audience(Collections.singletonList("client-1"))
+            .issuedAt(issuedAt)
+            .notBefore(issuedAt)
+            .expiresAt(expiresAt)
+            .id("id")
+            .claims(claims -> claims.put(customClaimName, customClaimValue))
+            .build();
 
-		OAuth2TokenClaimsSet claimsSet = OAuth2TokenClaimsSet.builder()
-				.issuer(expectedClaimsSet.getIssuer().toExternalForm())
-				.subject(expectedClaimsSet.getSubject())
-				.audience(expectedClaimsSet.getAudience())
-				.issuedAt(expectedClaimsSet.getIssuedAt())
-				.notBefore(expectedClaimsSet.getNotBefore())
-				.expiresAt(expectedClaimsSet.getExpiresAt())
-				.id(expectedClaimsSet.getId())
-				.claims(claims -> claims.put(customClaimName, expectedClaimsSet.getClaim(customClaimName)))
-				.build();
-		// @formatter:on
+    OAuth2TokenClaimsSet claimsSet =
+        OAuth2TokenClaimsSet.builder()
+            .issuer(expectedClaimsSet.getIssuer().toExternalForm())
+            .subject(expectedClaimsSet.getSubject())
+            .audience(expectedClaimsSet.getAudience())
+            .issuedAt(expectedClaimsSet.getIssuedAt())
+            .notBefore(expectedClaimsSet.getNotBefore())
+            .expiresAt(expectedClaimsSet.getExpiresAt())
+            .id(expectedClaimsSet.getId())
+            .claims(
+                claims -> claims.put(customClaimName, expectedClaimsSet.getClaim(customClaimName)))
+            .build();
+    // @formatter:on
 
-		assertThat(claimsSet.getIssuer()).isEqualTo(expectedClaimsSet.getIssuer());
-		assertThat(claimsSet.getSubject()).isEqualTo(expectedClaimsSet.getSubject());
-		assertThat(claimsSet.getAudience()).isEqualTo(expectedClaimsSet.getAudience());
-		assertThat(claimsSet.getIssuedAt()).isEqualTo(expectedClaimsSet.getIssuedAt());
-		assertThat(claimsSet.getNotBefore()).isEqualTo(expectedClaimsSet.getNotBefore());
-		assertThat(claimsSet.getExpiresAt()).isEqualTo(expectedClaimsSet.getExpiresAt());
-		assertThat(claimsSet.getId()).isEqualTo(expectedClaimsSet.getId());
-		assertThat(claimsSet.<String>getClaim(customClaimName)).isEqualTo(expectedClaimsSet.getClaim(customClaimName));
-		assertThat(claimsSet.getClaims()).isEqualTo(expectedClaimsSet.getClaims());
-	}
+    assertThat(claimsSet.getIssuer()).isEqualTo(expectedClaimsSet.getIssuer());
+    assertThat(claimsSet.getSubject()).isEqualTo(expectedClaimsSet.getSubject());
+    assertThat(claimsSet.getAudience()).isEqualTo(expectedClaimsSet.getAudience());
+    assertThat(claimsSet.getIssuedAt()).isEqualTo(expectedClaimsSet.getIssuedAt());
+    assertThat(claimsSet.getNotBefore()).isEqualTo(expectedClaimsSet.getNotBefore());
+    assertThat(claimsSet.getExpiresAt()).isEqualTo(expectedClaimsSet.getExpiresAt());
+    assertThat(claimsSet.getId()).isEqualTo(expectedClaimsSet.getId());
+    assertThat(claimsSet.<String>getClaim(customClaimName))
+        .isEqualTo(expectedClaimsSet.getClaim(customClaimName));
+    assertThat(claimsSet.getClaims()).isEqualTo(expectedClaimsSet.getClaims());
+  }
 
-	@Test
-	public void claimWhenNameNullThenThrowIllegalArgumentException() {
-		assertThatThrownBy(() -> OAuth2TokenClaimsSet.builder().claim(null, "value"))
-				.isInstanceOf(IllegalArgumentException.class)
-				.hasMessage("name cannot be empty");
-	}
+  @Test
+  public void claimWhenNameNullThenThrowIllegalArgumentException() {
+    assertThatThrownBy(() -> OAuth2TokenClaimsSet.builder().claim(null, "value"))
+        .isInstanceOf(IllegalArgumentException.class)
+        .hasMessage("name cannot be empty");
+  }
 
-	@Test
-	public void claimWhenValueNullThenThrowIllegalArgumentException() {
-		assertThatThrownBy(() -> OAuth2TokenClaimsSet.builder().claim("name", null))
-				.isInstanceOf(IllegalArgumentException.class)
-				.hasMessage("value cannot be null");
-	}
-
+  @Test
+  public void claimWhenValueNullThenThrowIllegalArgumentException() {
+    assertThatThrownBy(() -> OAuth2TokenClaimsSet.builder().claim("name", null))
+        .isInstanceOf(IllegalArgumentException.class)
+        .hasMessage("value cannot be null");
+  }
 }

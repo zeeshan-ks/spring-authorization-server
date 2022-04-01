@@ -15,21 +15,19 @@
  */
 package org.springframework.security.oauth2.server.authorization.authentication;
 
-import org.junit.Test;
-
-import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
-import org.springframework.security.oauth2.core.OAuth2AccessToken;
-import org.springframework.security.oauth2.core.OAuth2RefreshToken;
-import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
-import org.springframework.security.oauth2.server.authorization.client.TestRegisteredClients;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import org.junit.Test;
+import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
+import org.springframework.security.oauth2.core.OAuth2AccessToken;
+import org.springframework.security.oauth2.core.OAuth2RefreshToken;
+import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
+import org.springframework.security.oauth2.server.authorization.client.TestRegisteredClients;
 
 /**
  * Tests for {@link OAuth2AccessTokenAuthenticationToken}.
@@ -37,53 +35,82 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  * @author Joe Grandja
  */
 public class OAuth2AccessTokenAuthenticationTokenTests {
-	private RegisteredClient registeredClient = TestRegisteredClients.registeredClient().build();
-	private OAuth2ClientAuthenticationToken clientPrincipal = new OAuth2ClientAuthenticationToken(
-			this.registeredClient, ClientAuthenticationMethod.CLIENT_SECRET_BASIC, this.registeredClient.getClientSecret());
-	private OAuth2AccessToken accessToken = new OAuth2AccessToken(OAuth2AccessToken.TokenType.BEARER,
-			"access-token", Instant.now(), Instant.now().plusSeconds(300));
-	private OAuth2RefreshToken refreshToken = new OAuth2RefreshToken(
-			"refresh-token", Instant.now(), Instant.now().plus(1, ChronoUnit.DAYS));
-	private Map<String, Object> additionalParameters = Collections.singletonMap("custom-param", "custom-value");
+  private RegisteredClient registeredClient = TestRegisteredClients.registeredClient().build();
+  private OAuth2ClientAuthenticationToken clientPrincipal =
+      new OAuth2ClientAuthenticationToken(
+          this.registeredClient,
+          ClientAuthenticationMethod.CLIENT_SECRET_BASIC,
+          this.registeredClient.getClientSecret());
+  private OAuth2AccessToken accessToken =
+      new OAuth2AccessToken(
+          OAuth2AccessToken.TokenType.BEARER,
+          "access-token",
+          Instant.now(),
+          Instant.now().plusSeconds(300));
+  private OAuth2RefreshToken refreshToken =
+      new OAuth2RefreshToken(
+          "refresh-token", Instant.now(), Instant.now().plus(1, ChronoUnit.DAYS));
+  private Map<String, Object> additionalParameters =
+      Collections.singletonMap("custom-param", "custom-value");
 
-	@Test
-	public void constructorWhenRegisteredClientNullThenThrowIllegalArgumentException() {
-		assertThatThrownBy(() -> new OAuth2AccessTokenAuthenticationToken(null, this.clientPrincipal, this.accessToken))
-				.isInstanceOf(IllegalArgumentException.class)
-				.hasMessage("registeredClient cannot be null");
-	}
+  @Test
+  public void constructorWhenRegisteredClientNullThenThrowIllegalArgumentException() {
+    assertThatThrownBy(
+            () ->
+                new OAuth2AccessTokenAuthenticationToken(
+                    null, this.clientPrincipal, this.accessToken))
+        .isInstanceOf(IllegalArgumentException.class)
+        .hasMessage("registeredClient cannot be null");
+  }
 
-	@Test
-	public void constructorWhenClientPrincipalNullThenThrowIllegalArgumentException() {
-		assertThatThrownBy(() -> new OAuth2AccessTokenAuthenticationToken(this.registeredClient, null, this.accessToken))
-				.isInstanceOf(IllegalArgumentException.class)
-				.hasMessage("clientPrincipal cannot be null");
-	}
+  @Test
+  public void constructorWhenClientPrincipalNullThenThrowIllegalArgumentException() {
+    assertThatThrownBy(
+            () ->
+                new OAuth2AccessTokenAuthenticationToken(
+                    this.registeredClient, null, this.accessToken))
+        .isInstanceOf(IllegalArgumentException.class)
+        .hasMessage("clientPrincipal cannot be null");
+  }
 
-	@Test
-	public void constructorWhenAccessTokenNullThenThrowIllegalArgumentException() {
-		assertThatThrownBy(() -> new OAuth2AccessTokenAuthenticationToken(this.registeredClient, this.clientPrincipal, null))
-				.isInstanceOf(IllegalArgumentException.class)
-				.hasMessage("accessToken cannot be null");
-	}
+  @Test
+  public void constructorWhenAccessTokenNullThenThrowIllegalArgumentException() {
+    assertThatThrownBy(
+            () ->
+                new OAuth2AccessTokenAuthenticationToken(
+                    this.registeredClient, this.clientPrincipal, null))
+        .isInstanceOf(IllegalArgumentException.class)
+        .hasMessage("accessToken cannot be null");
+  }
 
-	@Test
-	public void constructorWhenAdditionalParametersNullThenThrowIllegalArgumentException() {
-		assertThatThrownBy(() -> new OAuth2AccessTokenAuthenticationToken(
-				this.registeredClient, this.clientPrincipal, this.accessToken, this.refreshToken, null))
-				.isInstanceOf(IllegalArgumentException.class)
-				.hasMessage("additionalParameters cannot be null");
-	}
+  @Test
+  public void constructorWhenAdditionalParametersNullThenThrowIllegalArgumentException() {
+    assertThatThrownBy(
+            () ->
+                new OAuth2AccessTokenAuthenticationToken(
+                    this.registeredClient,
+                    this.clientPrincipal,
+                    this.accessToken,
+                    this.refreshToken,
+                    null))
+        .isInstanceOf(IllegalArgumentException.class)
+        .hasMessage("additionalParameters cannot be null");
+  }
 
-	@Test
-	public void constructorWhenAllValuesProvidedThenCreated() {
-		OAuth2AccessTokenAuthenticationToken authentication = new OAuth2AccessTokenAuthenticationToken(
-				this.registeredClient, this.clientPrincipal, this.accessToken, this.refreshToken, this.additionalParameters);
-		assertThat(authentication.getPrincipal()).isEqualTo(this.clientPrincipal);
-		assertThat(authentication.getCredentials().toString()).isEmpty();
-		assertThat(authentication.getRegisteredClient()).isEqualTo(this.registeredClient);
-		assertThat(authentication.getAccessToken()).isEqualTo(this.accessToken);
-		assertThat(authentication.getRefreshToken()).isEqualTo(this.refreshToken);
-		assertThat(authentication.getAdditionalParameters()).isEqualTo(this.additionalParameters);
-	}
+  @Test
+  public void constructorWhenAllValuesProvidedThenCreated() {
+    OAuth2AccessTokenAuthenticationToken authentication =
+        new OAuth2AccessTokenAuthenticationToken(
+            this.registeredClient,
+            this.clientPrincipal,
+            this.accessToken,
+            this.refreshToken,
+            this.additionalParameters);
+    assertThat(authentication.getPrincipal()).isEqualTo(this.clientPrincipal);
+    assertThat(authentication.getCredentials().toString()).isEmpty();
+    assertThat(authentication.getRegisteredClient()).isEqualTo(this.registeredClient);
+    assertThat(authentication.getAccessToken()).isEqualTo(this.accessToken);
+    assertThat(authentication.getRefreshToken()).isEqualTo(this.refreshToken);
+    assertThat(authentication.getAdditionalParameters()).isEqualTo(this.additionalParameters);
+  }
 }

@@ -16,7 +16,6 @@
 package org.springframework.security.config.annotation.web.configurers.oauth2.server.authorization;
 
 import java.util.function.Function;
-
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.ObjectPostProcessor;
@@ -43,69 +42,72 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
  * @see OidcUserInfoEndpointFilter
  */
 public final class OidcUserInfoEndpointConfigurer extends AbstractOAuth2Configurer {
-	private RequestMatcher requestMatcher;
-	private Function<OidcUserInfoAuthenticationContext, OidcUserInfo> userInfoMapper;
+  private RequestMatcher requestMatcher;
+  private Function<OidcUserInfoAuthenticationContext, OidcUserInfo> userInfoMapper;
 
-	/**
-	 * Restrict for internal use only.
-	 */
-	OidcUserInfoEndpointConfigurer(ObjectPostProcessor<Object> objectPostProcessor) {
-		super(objectPostProcessor);
-	}
+  /** Restrict for internal use only. */
+  OidcUserInfoEndpointConfigurer(ObjectPostProcessor<Object> objectPostProcessor) {
+    super(objectPostProcessor);
+  }
 
-	/**
-	 * Sets the {@link Function} used to extract claims from {@link OidcUserInfoAuthenticationContext}
-	 * to an instance of {@link OidcUserInfo} for the UserInfo response.
-	 *
-	 * <p>
-	 * The {@link OidcUserInfoAuthenticationContext} gives the mapper access to the {@link OidcUserInfoAuthenticationToken},
-	 * as well as, the following context attributes:
-	 * <ul>
-	 * <li>{@link OidcUserInfoAuthenticationContext#getAccessToken()} containing the bearer token used to make the request.</li>
-	 * <li>{@link OidcUserInfoAuthenticationContext#getAuthorization()} containing the {@link OidcIdToken} and
-	 * {@link OAuth2AccessToken} associated with the bearer token used to make the request.</li>
-	 * </ul>
-	 *
-	 * @param userInfoMapper the {@link Function} used to extract claims from {@link OidcUserInfoAuthenticationContext} to an instance of {@link OidcUserInfo}
-	 * @return the {@link OidcUserInfoEndpointConfigurer} for further configuration
-	 */
-	public OidcUserInfoEndpointConfigurer userInfoMapper(Function<OidcUserInfoAuthenticationContext, OidcUserInfo> userInfoMapper) {
-		this.userInfoMapper = userInfoMapper;
-		return this;
-	}
+  /**
+   * Sets the {@link Function} used to extract claims from {@link OidcUserInfoAuthenticationContext}
+   * to an instance of {@link OidcUserInfo} for the UserInfo response.
+   *
+   * <p>The {@link OidcUserInfoAuthenticationContext} gives the mapper access to the {@link
+   * OidcUserInfoAuthenticationToken}, as well as, the following context attributes:
+   *
+   * <ul>
+   *   <li>{@link OidcUserInfoAuthenticationContext#getAccessToken()} containing the bearer token
+   *       used to make the request.
+   *   <li>{@link OidcUserInfoAuthenticationContext#getAuthorization()} containing the {@link
+   *       OidcIdToken} and {@link OAuth2AccessToken} associated with the bearer token used to make
+   *       the request.
+   * </ul>
+   *
+   * @param userInfoMapper the {@link Function} used to extract claims from {@link
+   *     OidcUserInfoAuthenticationContext} to an instance of {@link OidcUserInfo}
+   * @return the {@link OidcUserInfoEndpointConfigurer} for further configuration
+   */
+  public OidcUserInfoEndpointConfigurer userInfoMapper(
+      Function<OidcUserInfoAuthenticationContext, OidcUserInfo> userInfoMapper) {
+    this.userInfoMapper = userInfoMapper;
+    return this;
+  }
 
-	@Override
-	<B extends HttpSecurityBuilder<B>> void init(B builder) {
-		ProviderSettings providerSettings = OAuth2ConfigurerUtils.getProviderSettings(builder);
-		String userInfoEndpointUri = providerSettings.getOidcUserInfoEndpoint();
-		this.requestMatcher = new OrRequestMatcher(
-				new AntPathRequestMatcher(userInfoEndpointUri, HttpMethod.GET.name()),
-				new AntPathRequestMatcher(userInfoEndpointUri, HttpMethod.POST.name()));
+  @Override
+  <B extends HttpSecurityBuilder<B>> void init(B builder) {
+    ProviderSettings providerSettings = OAuth2ConfigurerUtils.getProviderSettings(builder);
+    String userInfoEndpointUri = providerSettings.getOidcUserInfoEndpoint();
+    this.requestMatcher =
+        new OrRequestMatcher(
+            new AntPathRequestMatcher(userInfoEndpointUri, HttpMethod.GET.name()),
+            new AntPathRequestMatcher(userInfoEndpointUri, HttpMethod.POST.name()));
 
-		OidcUserInfoAuthenticationProvider oidcUserInfoAuthenticationProvider =
-				new OidcUserInfoAuthenticationProvider(
-						OAuth2ConfigurerUtils.getAuthorizationService(builder));
-		if (this.userInfoMapper != null) {
-			oidcUserInfoAuthenticationProvider.setUserInfoMapper(this.userInfoMapper);
-		}
-		builder.authenticationProvider(postProcess(oidcUserInfoAuthenticationProvider));
-	}
+    OidcUserInfoAuthenticationProvider oidcUserInfoAuthenticationProvider =
+        new OidcUserInfoAuthenticationProvider(
+            OAuth2ConfigurerUtils.getAuthorizationService(builder));
+    if (this.userInfoMapper != null) {
+      oidcUserInfoAuthenticationProvider.setUserInfoMapper(this.userInfoMapper);
+    }
+    builder.authenticationProvider(postProcess(oidcUserInfoAuthenticationProvider));
+  }
 
-	@Override
-	<B extends HttpSecurityBuilder<B>> void configure(B builder) {
-		AuthenticationManager authenticationManager = builder.getSharedObject(AuthenticationManager.class);
-		ProviderSettings providerSettings = OAuth2ConfigurerUtils.getProviderSettings(builder);
+  @Override
+  <B extends HttpSecurityBuilder<B>> void configure(B builder) {
+    AuthenticationManager authenticationManager =
+        builder.getSharedObject(AuthenticationManager.class);
+    ProviderSettings providerSettings = OAuth2ConfigurerUtils.getProviderSettings(builder);
 
-		OidcUserInfoEndpointFilter oidcUserInfoEndpointFilter =
-				new OidcUserInfoEndpointFilter(
-						authenticationManager,
-						providerSettings.getOidcUserInfoEndpoint());
-		builder.addFilterAfter(postProcess(oidcUserInfoEndpointFilter), FilterSecurityInterceptor.class);
-	}
+    OidcUserInfoEndpointFilter oidcUserInfoEndpointFilter =
+        new OidcUserInfoEndpointFilter(
+            authenticationManager, providerSettings.getOidcUserInfoEndpoint());
+    builder.addFilterAfter(
+        postProcess(oidcUserInfoEndpointFilter), FilterSecurityInterceptor.class);
+  }
 
-	@Override
-	RequestMatcher getRequestMatcher() {
-		return this.requestMatcher;
-	}
-
+  @Override
+  RequestMatcher getRequestMatcher() {
+    return this.requestMatcher;
+  }
 }

@@ -15,10 +15,10 @@
  */
 package org.springframework.security.oauth2.server.authorization.config;
 
-import org.junit.Test;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
+
+import org.junit.Test;
 
 /**
  * Tests for {@link ProviderSettings}.
@@ -27,119 +27,122 @@ import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException
  */
 public class ProviderSettingsTests {
 
-	@Test
-	public void buildWhenDefaultThenDefaultsAreSet() {
-		ProviderSettings providerSettings = ProviderSettings.builder().build();
+  @Test
+  public void buildWhenDefaultThenDefaultsAreSet() {
+    ProviderSettings providerSettings = ProviderSettings.builder().build();
 
-		assertThat(providerSettings.getIssuer()).isNull();
-		assertThat(providerSettings.getAuthorizationEndpoint()).isEqualTo("/oauth2/authorize");
-		assertThat(providerSettings.getTokenEndpoint()).isEqualTo("/oauth2/token");
-		assertThat(providerSettings.getJwkSetEndpoint()).isEqualTo("/oauth2/jwks");
-		assertThat(providerSettings.getTokenRevocationEndpoint()).isEqualTo("/oauth2/revoke");
-		assertThat(providerSettings.getTokenIntrospectionEndpoint()).isEqualTo("/oauth2/introspect");
-		assertThat(providerSettings.getOidcClientRegistrationEndpoint()).isEqualTo("/connect/register");
-		assertThat(providerSettings.getOidcUserInfoEndpoint()).isEqualTo("/userinfo");
-	}
+    assertThat(providerSettings.getIssuer()).isNull();
+    assertThat(providerSettings.getAuthorizationEndpoint()).isEqualTo("/oauth2/authorize");
+    assertThat(providerSettings.getTokenEndpoint()).isEqualTo("/oauth2/token");
+    assertThat(providerSettings.getJwkSetEndpoint()).isEqualTo("/oauth2/jwks");
+    assertThat(providerSettings.getTokenRevocationEndpoint()).isEqualTo("/oauth2/revoke");
+    assertThat(providerSettings.getTokenIntrospectionEndpoint()).isEqualTo("/oauth2/introspect");
+    assertThat(providerSettings.getOidcClientRegistrationEndpoint()).isEqualTo("/connect/register");
+    assertThat(providerSettings.getOidcUserInfoEndpoint()).isEqualTo("/userinfo");
+  }
 
-	@Test
-	public void buildWhenSettingsProvidedThenSet() {
-		String authorizationEndpoint = "/oauth2/v1/authorize";
-		String tokenEndpoint = "/oauth2/v1/token";
-		String jwkSetEndpoint = "/oauth2/v1/jwks";
-		String tokenRevocationEndpoint = "/oauth2/v1/revoke";
-		String tokenIntrospectionEndpoint = "/oauth2/v1/introspect";
-		String oidcClientRegistrationEndpoint = "/connect/v1/register";
-		String oidcUserInfoEndpoint = "/connect/v1/userinfo";
-		String issuer = "https://example.com:9000";
+  @Test
+  public void buildWhenSettingsProvidedThenSet() {
+    String authorizationEndpoint = "/oauth2/v1/authorize";
+    String tokenEndpoint = "/oauth2/v1/token";
+    String jwkSetEndpoint = "/oauth2/v1/jwks";
+    String tokenRevocationEndpoint = "/oauth2/v1/revoke";
+    String tokenIntrospectionEndpoint = "/oauth2/v1/introspect";
+    String oidcClientRegistrationEndpoint = "/connect/v1/register";
+    String oidcUserInfoEndpoint = "/connect/v1/userinfo";
+    String issuer = "https://example.com:9000";
 
-		ProviderSettings providerSettings = ProviderSettings.builder()
-				.issuer(issuer)
-				.authorizationEndpoint(authorizationEndpoint)
-				.tokenEndpoint(tokenEndpoint)
-				.jwkSetEndpoint(jwkSetEndpoint)
-				.tokenRevocationEndpoint(tokenRevocationEndpoint)
-				.tokenIntrospectionEndpoint(tokenIntrospectionEndpoint)
-				.tokenRevocationEndpoint(tokenRevocationEndpoint)
-				.oidcClientRegistrationEndpoint(oidcClientRegistrationEndpoint)
-				.oidcUserInfoEndpoint(oidcUserInfoEndpoint)
-				.build();
+    ProviderSettings providerSettings =
+        ProviderSettings.builder()
+            .issuer(issuer)
+            .authorizationEndpoint(authorizationEndpoint)
+            .tokenEndpoint(tokenEndpoint)
+            .jwkSetEndpoint(jwkSetEndpoint)
+            .tokenRevocationEndpoint(tokenRevocationEndpoint)
+            .tokenIntrospectionEndpoint(tokenIntrospectionEndpoint)
+            .tokenRevocationEndpoint(tokenRevocationEndpoint)
+            .oidcClientRegistrationEndpoint(oidcClientRegistrationEndpoint)
+            .oidcUserInfoEndpoint(oidcUserInfoEndpoint)
+            .build();
 
-		assertThat(providerSettings.getIssuer()).isEqualTo(issuer);
-		assertThat(providerSettings.getAuthorizationEndpoint()).isEqualTo(authorizationEndpoint);
-		assertThat(providerSettings.getTokenEndpoint()).isEqualTo(tokenEndpoint);
-		assertThat(providerSettings.getJwkSetEndpoint()).isEqualTo(jwkSetEndpoint);
-		assertThat(providerSettings.getTokenRevocationEndpoint()).isEqualTo(tokenRevocationEndpoint);
-		assertThat(providerSettings.getTokenIntrospectionEndpoint()).isEqualTo(tokenIntrospectionEndpoint);
-		assertThat(providerSettings.getOidcClientRegistrationEndpoint()).isEqualTo(oidcClientRegistrationEndpoint);
-		assertThat(providerSettings.getOidcUserInfoEndpoint()).isEqualTo(oidcUserInfoEndpoint);
-	}
+    assertThat(providerSettings.getIssuer()).isEqualTo(issuer);
+    assertThat(providerSettings.getAuthorizationEndpoint()).isEqualTo(authorizationEndpoint);
+    assertThat(providerSettings.getTokenEndpoint()).isEqualTo(tokenEndpoint);
+    assertThat(providerSettings.getJwkSetEndpoint()).isEqualTo(jwkSetEndpoint);
+    assertThat(providerSettings.getTokenRevocationEndpoint()).isEqualTo(tokenRevocationEndpoint);
+    assertThat(providerSettings.getTokenIntrospectionEndpoint())
+        .isEqualTo(tokenIntrospectionEndpoint);
+    assertThat(providerSettings.getOidcClientRegistrationEndpoint())
+        .isEqualTo(oidcClientRegistrationEndpoint);
+    assertThat(providerSettings.getOidcUserInfoEndpoint()).isEqualTo(oidcUserInfoEndpoint);
+  }
 
-	@Test
-	public void settingWhenCustomThenSet() {
-		ProviderSettings providerSettings = ProviderSettings.builder()
-				.setting("name1", "value1")
-				.settings(settings -> settings.put("name2", "value2"))
-				.build();
+  @Test
+  public void settingWhenCustomThenSet() {
+    ProviderSettings providerSettings =
+        ProviderSettings.builder()
+            .setting("name1", "value1")
+            .settings(settings -> settings.put("name2", "value2"))
+            .build();
 
-		assertThat(providerSettings.getSettings()).hasSize(9);
-		assertThat(providerSettings.<String>getSetting("name1")).isEqualTo("value1");
-		assertThat(providerSettings.<String>getSetting("name2")).isEqualTo("value2");
-	}
+    assertThat(providerSettings.getSettings()).hasSize(9);
+    assertThat(providerSettings.<String>getSetting("name1")).isEqualTo("value1");
+    assertThat(providerSettings.<String>getSetting("name2")).isEqualTo("value2");
+  }
 
-	@Test
-	public void issuerWhenNullThenThrowIllegalArgumentException() {
-		assertThatIllegalArgumentException()
-				.isThrownBy(() -> ProviderSettings.builder().issuer(null))
-				.withMessage("value cannot be null");
-	}
+  @Test
+  public void issuerWhenNullThenThrowIllegalArgumentException() {
+    assertThatIllegalArgumentException()
+        .isThrownBy(() -> ProviderSettings.builder().issuer(null))
+        .withMessage("value cannot be null");
+  }
 
-	@Test
-	public void authorizationEndpointWhenNullThenThrowIllegalArgumentException() {
-		assertThatIllegalArgumentException()
-				.isThrownBy(() -> ProviderSettings.builder().authorizationEndpoint(null))
-				.withMessage("value cannot be null");
-	}
+  @Test
+  public void authorizationEndpointWhenNullThenThrowIllegalArgumentException() {
+    assertThatIllegalArgumentException()
+        .isThrownBy(() -> ProviderSettings.builder().authorizationEndpoint(null))
+        .withMessage("value cannot be null");
+  }
 
-	@Test
-	public void tokenEndpointWhenNullThenThrowIllegalArgumentException() {
-		assertThatIllegalArgumentException()
-				.isThrownBy(() -> ProviderSettings.builder().tokenEndpoint(null))
-				.withMessage("value cannot be null");
-	}
+  @Test
+  public void tokenEndpointWhenNullThenThrowIllegalArgumentException() {
+    assertThatIllegalArgumentException()
+        .isThrownBy(() -> ProviderSettings.builder().tokenEndpoint(null))
+        .withMessage("value cannot be null");
+  }
 
-	@Test
-	public void tokenRevocationEndpointWhenNullThenThrowIllegalArgumentException() {
-		assertThatIllegalArgumentException()
-				.isThrownBy(() -> ProviderSettings.builder().tokenRevocationEndpoint(null))
-				.withMessage("value cannot be null");
-	}
+  @Test
+  public void tokenRevocationEndpointWhenNullThenThrowIllegalArgumentException() {
+    assertThatIllegalArgumentException()
+        .isThrownBy(() -> ProviderSettings.builder().tokenRevocationEndpoint(null))
+        .withMessage("value cannot be null");
+  }
 
-	@Test
-	public void tokenIntrospectionEndpointWhenNullThenThrowIllegalArgumentException() {
-		assertThatIllegalArgumentException()
-				.isThrownBy(() -> ProviderSettings.builder().tokenIntrospectionEndpoint(null))
-				.withMessage("value cannot be null");
-	}
+  @Test
+  public void tokenIntrospectionEndpointWhenNullThenThrowIllegalArgumentException() {
+    assertThatIllegalArgumentException()
+        .isThrownBy(() -> ProviderSettings.builder().tokenIntrospectionEndpoint(null))
+        .withMessage("value cannot be null");
+  }
 
-	@Test
-	public void oidcClientRegistrationEndpointWhenNullThenThrowIllegalArgumentException() {
-		assertThatIllegalArgumentException()
-				.isThrownBy(() -> ProviderSettings.builder().oidcClientRegistrationEndpoint(null))
-				.withMessage("value cannot be null");
-	}
+  @Test
+  public void oidcClientRegistrationEndpointWhenNullThenThrowIllegalArgumentException() {
+    assertThatIllegalArgumentException()
+        .isThrownBy(() -> ProviderSettings.builder().oidcClientRegistrationEndpoint(null))
+        .withMessage("value cannot be null");
+  }
 
-	@Test
-	public void oidcUserInfoEndpointWhenNullThenThrowIllegalArgumentException() {
-		assertThatIllegalArgumentException()
-				.isThrownBy(() -> ProviderSettings.builder().oidcUserInfoEndpoint(null))
-				.withMessage("value cannot be null");
-	}
+  @Test
+  public void oidcUserInfoEndpointWhenNullThenThrowIllegalArgumentException() {
+    assertThatIllegalArgumentException()
+        .isThrownBy(() -> ProviderSettings.builder().oidcUserInfoEndpoint(null))
+        .withMessage("value cannot be null");
+  }
 
-	@Test
-	public void jwksEndpointWhenNullThenThrowIllegalArgumentException() {
-		assertThatIllegalArgumentException()
-				.isThrownBy(() -> ProviderSettings.builder().jwkSetEndpoint(null))
-				.withMessage("value cannot be null");
-	}
-
+  @Test
+  public void jwksEndpointWhenNullThenThrowIllegalArgumentException() {
+    assertThatIllegalArgumentException()
+        .isThrownBy(() -> ProviderSettings.builder().jwkSetEndpoint(null))
+        .withMessage("value cannot be null");
+  }
 }

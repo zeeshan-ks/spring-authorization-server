@@ -26,24 +26,23 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
  * @since 0.1.2
  */
 abstract class AbstractOAuth2Configurer {
-	private final ObjectPostProcessor<Object> objectPostProcessor;
+  private final ObjectPostProcessor<Object> objectPostProcessor;
 
-	AbstractOAuth2Configurer(ObjectPostProcessor<Object> objectPostProcessor) {
-		this.objectPostProcessor = objectPostProcessor;
-	}
+  AbstractOAuth2Configurer(ObjectPostProcessor<Object> objectPostProcessor) {
+    this.objectPostProcessor = objectPostProcessor;
+  }
 
-	abstract <B extends HttpSecurityBuilder<B>> void init(B builder);
+  abstract <B extends HttpSecurityBuilder<B>> void init(B builder);
 
-	abstract <B extends HttpSecurityBuilder<B>> void configure(B builder);
+  abstract <B extends HttpSecurityBuilder<B>> void configure(B builder);
 
-	abstract RequestMatcher getRequestMatcher();
+  abstract RequestMatcher getRequestMatcher();
 
-	protected final <T> T postProcess(T object) {
-		return (T) this.objectPostProcessor.postProcess(object);
-	}
+  protected final <T> T postProcess(T object) {
+    return (T) this.objectPostProcessor.postProcess(object);
+  }
 
-	protected final ObjectPostProcessor<Object> getObjectPostProcessor() {
-		return this.objectPostProcessor;
-	}
-
+  protected final ObjectPostProcessor<Object> getObjectPostProcessor() {
+    return this.objectPostProcessor;
+  }
 }

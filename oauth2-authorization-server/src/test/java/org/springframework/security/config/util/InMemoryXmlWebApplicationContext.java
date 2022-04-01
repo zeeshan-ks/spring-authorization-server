@@ -15,6 +15,10 @@
  */
 package org.springframework.security.config.util;
 
+import static org.springframework.security.config.util.InMemoryXmlApplicationContext.BEANS_CLOSE;
+import static org.springframework.security.config.util.InMemoryXmlApplicationContext.BEANS_OPENING;
+import static org.springframework.security.config.util.InMemoryXmlApplicationContext.SPRING_SECURITY_VERSION;
+
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
@@ -23,39 +27,34 @@ import org.springframework.core.io.Resource;
 import org.springframework.security.util.InMemoryResource;
 import org.springframework.web.context.support.AbstractRefreshableWebApplicationContext;
 
-import static org.springframework.security.config.util.InMemoryXmlApplicationContext.BEANS_CLOSE;
-import static org.springframework.security.config.util.InMemoryXmlApplicationContext.BEANS_OPENING;
-import static org.springframework.security.config.util.InMemoryXmlApplicationContext.SPRING_SECURITY_VERSION;
-
 /**
- * TODO
- * This class is a straight copy from Spring Security.
- * It should be removed when merging this codebase into Spring Security.
+ * TODO This class is a straight copy from Spring Security. It should be removed when merging this
+ * codebase into Spring Security.
  *
  * @author Joe Grandja
  */
 public class InMemoryXmlWebApplicationContext extends AbstractRefreshableWebApplicationContext {
-	private Resource inMemoryXml;
+  private Resource inMemoryXml;
 
-	public InMemoryXmlWebApplicationContext(String xml) {
-		this(xml, SPRING_SECURITY_VERSION, null);
-	}
+  public InMemoryXmlWebApplicationContext(String xml) {
+    this(xml, SPRING_SECURITY_VERSION, null);
+  }
 
-	public InMemoryXmlWebApplicationContext(String xml, ApplicationContext parent) {
-		this(xml, SPRING_SECURITY_VERSION, parent);
-	}
+  public InMemoryXmlWebApplicationContext(String xml, ApplicationContext parent) {
+    this(xml, SPRING_SECURITY_VERSION, parent);
+  }
 
-	public InMemoryXmlWebApplicationContext(String xml, String secVersion, ApplicationContext parent) {
-		String fullXml = BEANS_OPENING + secVersion + ".xsd'>\n" + xml + BEANS_CLOSE;
-		inMemoryXml = new InMemoryResource(fullXml);
-		setAllowBeanDefinitionOverriding(true);
-		setParent(parent);
-	}
+  public InMemoryXmlWebApplicationContext(
+      String xml, String secVersion, ApplicationContext parent) {
+    String fullXml = BEANS_OPENING + secVersion + ".xsd'>\n" + xml + BEANS_CLOSE;
+    inMemoryXml = new InMemoryResource(fullXml);
+    setAllowBeanDefinitionOverriding(true);
+    setParent(parent);
+  }
 
-	@Override
-	protected void loadBeanDefinitions(DefaultListableBeanFactory beanFactory) throws BeansException {
-		XmlBeanDefinitionReader reader = new XmlBeanDefinitionReader(beanFactory);
-		reader.loadBeanDefinitions(new Resource[] { inMemoryXml });
-	}
-
+  @Override
+  protected void loadBeanDefinitions(DefaultListableBeanFactory beanFactory) throws BeansException {
+    XmlBeanDefinitionReader reader = new XmlBeanDefinitionReader(beanFactory);
+    reader.loadBeanDefinitions(new Resource[] {inMemoryXml});
+  }
 }

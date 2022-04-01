@@ -19,29 +19,26 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 
-/**
- * @author Joe Grandja
- */
+/** @author Joe Grandja */
 public final class TestJwtClaimsSets {
 
-	private TestJwtClaimsSets() {
-	}
+  private TestJwtClaimsSets() {}
 
-	public static JwtClaimsSet.Builder jwtClaimsSet() {
-		String issuer = "https://provider.com";
-		Instant issuedAt = Instant.now();
-		Instant expiresAt = issuedAt.plus(1, ChronoUnit.HOURS);
+  public static JwtClaimsSet.Builder jwtClaimsSet() {
+    String issuer = "https://provider.com";
+    Instant issuedAt = Instant.now();
+    Instant expiresAt = issuedAt.plus(1, ChronoUnit.HOURS);
 
-		// @formatter:off
-		return JwtClaimsSet.builder()
-				.issuer(issuer)
-				.subject("subject")
-				.audience(Collections.singletonList("client-1"))
-				.issuedAt(issuedAt)
-				.notBefore(issuedAt)
-				.expiresAt(expiresAt)
-				.id("jti")
-				.claim("custom-claim-name", "custom-claim-value");
-		// @formatter:on
-	}
+    // @formatter:off
+    return JwtClaimsSet.builder()
+        .issuer(issuer)
+        .subject("subject")
+        .audience(Collections.singletonList("client-1"))
+        .issuedAt(issuedAt)
+        .notBefore(issuedAt)
+        .expiresAt(expiresAt)
+        .id("jti")
+        .claim("custom-claim-name", "custom-claim-value");
+    // @formatter:on
+  }
 }

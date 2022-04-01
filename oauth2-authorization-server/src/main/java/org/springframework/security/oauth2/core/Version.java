@@ -22,16 +22,14 @@ package org.springframework.security.oauth2.core;
  * @since 0.0.1
  */
 public final class Version {
-	private static final int MAJOR = 0;
-	private static final int MINOR = 3;
-	private static final int PATCH = 0;
+  private static final int MAJOR = 0;
+  private static final int MINOR = 3;
+  private static final int PATCH = 0;
 
-	/**
-	 * Global Serialization value for Spring Security Authorization Server classes.
-	 */
-	public static final long SERIAL_VERSION_UID = getVersion().hashCode();
+  /** Global Serialization value for Spring Security Authorization Server classes. */
+  public static final long SERIAL_VERSION_UID = getVersion().hashCode();
 
-	public static String getVersion() {
-		return MAJOR + "." + MINOR + "." + PATCH;
-	}
+  public static String getVersion() {
+    return MAJOR + "." + MINOR + "." + PATCH;
+  }
 }

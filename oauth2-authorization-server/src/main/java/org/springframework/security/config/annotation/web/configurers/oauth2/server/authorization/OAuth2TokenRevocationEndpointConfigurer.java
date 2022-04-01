@@ -18,9 +18,7 @@ package org.springframework.security.config.annotation.web.configurers.oauth2.se
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
-
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -49,113 +47,126 @@ import org.springframework.util.Assert;
  * @see OAuth2TokenRevocationEndpointFilter
  */
 public final class OAuth2TokenRevocationEndpointConfigurer extends AbstractOAuth2Configurer {
-	private RequestMatcher requestMatcher;
-	private AuthenticationConverter revocationRequestConverter;
-	private final List<AuthenticationProvider> authenticationProviders = new LinkedList<>();
-	private AuthenticationSuccessHandler revocationResponseHandler;
-	private AuthenticationFailureHandler errorResponseHandler;
+  private RequestMatcher requestMatcher;
+  private AuthenticationConverter revocationRequestConverter;
+  private final List<AuthenticationProvider> authenticationProviders = new LinkedList<>();
+  private AuthenticationSuccessHandler revocationResponseHandler;
+  private AuthenticationFailureHandler errorResponseHandler;
 
-	/**
-	 * Restrict for internal use only.
-	 */
-	OAuth2TokenRevocationEndpointConfigurer(ObjectPostProcessor<Object> objectPostProcessor) {
-		super(objectPostProcessor);
-	}
+  /** Restrict for internal use only. */
+  OAuth2TokenRevocationEndpointConfigurer(ObjectPostProcessor<Object> objectPostProcessor) {
+    super(objectPostProcessor);
+  }
 
-	/**
-	 * Sets the {@link AuthenticationConverter} used when attempting to extract a Revoke Token Request from {@link HttpServletRequest}
-	 * to an instance of {@link OAuth2TokenRevocationAuthenticationToken} used for authenticating the client.
-	 *
-	 * @param revocationRequestConverter the {@link AuthenticationConverter} used when attempting to extract client credentials from {@link HttpServletRequest}
-	 * @return the {@link OAuth2TokenRevocationEndpointConfigurer} for further configuration
-	 */
-	public OAuth2TokenRevocationEndpointConfigurer revocationRequestConverter(AuthenticationConverter revocationRequestConverter) {
-		this.revocationRequestConverter = revocationRequestConverter;
-		return this;
-	}
+  /**
+   * Sets the {@link AuthenticationConverter} used when attempting to extract a Revoke Token Request
+   * from {@link HttpServletRequest} to an instance of {@link
+   * OAuth2TokenRevocationAuthenticationToken} used for authenticating the client.
+   *
+   * @param revocationRequestConverter the {@link AuthenticationConverter} used when attempting to
+   *     extract client credentials from {@link HttpServletRequest}
+   * @return the {@link OAuth2TokenRevocationEndpointConfigurer} for further configuration
+   */
+  public OAuth2TokenRevocationEndpointConfigurer revocationRequestConverter(
+      AuthenticationConverter revocationRequestConverter) {
+    this.revocationRequestConverter = revocationRequestConverter;
+    return this;
+  }
 
-	/**
-	 * Adds an {@link AuthenticationProvider} used for authenticating a type of {@link OAuth2TokenRevocationAuthenticationToken}.
-	 *
-	 * @param authenticationProvider an {@link AuthenticationProvider} used for authenticating a type of {@link OAuth2TokenRevocationAuthenticationToken}
-	 * @return the {@link OAuth2TokenRevocationEndpointConfigurer} for further configuration
-	 */
-	public OAuth2TokenRevocationEndpointConfigurer authenticationProvider(AuthenticationProvider authenticationProvider) {
-		Assert.notNull(authenticationProvider, "authenticationProvider cannot be null");
-		this.authenticationProviders.add(authenticationProvider);
-		return this;
-	}
+  /**
+   * Adds an {@link AuthenticationProvider} used for authenticating a type of {@link
+   * OAuth2TokenRevocationAuthenticationToken}.
+   *
+   * @param authenticationProvider an {@link AuthenticationProvider} used for authenticating a type
+   *     of {@link OAuth2TokenRevocationAuthenticationToken}
+   * @return the {@link OAuth2TokenRevocationEndpointConfigurer} for further configuration
+   */
+  public OAuth2TokenRevocationEndpointConfigurer authenticationProvider(
+      AuthenticationProvider authenticationProvider) {
+    Assert.notNull(authenticationProvider, "authenticationProvider cannot be null");
+    this.authenticationProviders.add(authenticationProvider);
+    return this;
+  }
 
-	/**
-	 * Sets the {@link AuthenticationSuccessHandler} used for handling an {@link OAuth2TokenRevocationAuthenticationToken}.
-	 *
-	 * @param revocationResponseHandler the {@link AuthenticationSuccessHandler} used for handling an {@link OAuth2TokenRevocationAuthenticationToken}
-	 * @return the {@link OAuth2TokenRevocationEndpointConfigurer} for further configuration
-	 */
-	public OAuth2TokenRevocationEndpointConfigurer revocationResponseHandler(AuthenticationSuccessHandler revocationResponseHandler) {
-		this.revocationResponseHandler = revocationResponseHandler;
-		return this;
-	}
+  /**
+   * Sets the {@link AuthenticationSuccessHandler} used for handling an {@link
+   * OAuth2TokenRevocationAuthenticationToken}.
+   *
+   * @param revocationResponseHandler the {@link AuthenticationSuccessHandler} used for handling an
+   *     {@link OAuth2TokenRevocationAuthenticationToken}
+   * @return the {@link OAuth2TokenRevocationEndpointConfigurer} for further configuration
+   */
+  public OAuth2TokenRevocationEndpointConfigurer revocationResponseHandler(
+      AuthenticationSuccessHandler revocationResponseHandler) {
+    this.revocationResponseHandler = revocationResponseHandler;
+    return this;
+  }
 
-	/**
-	 * Sets the {@link AuthenticationFailureHandler} used for handling an {@link OAuth2AuthenticationException}
-	 * and returning the {@link OAuth2Error Error Response}.
-	 *
-	 * @param errorResponseHandler the {@link AuthenticationFailureHandler} used for handling an {@link OAuth2AuthenticationException}
-	 * @return the {@link OAuth2TokenRevocationEndpointConfigurer} for further configuration
-	 */
-	public OAuth2TokenRevocationEndpointConfigurer errorResponseHandler(AuthenticationFailureHandler errorResponseHandler) {
-		this.errorResponseHandler = errorResponseHandler;
-		return this;
-	}
+  /**
+   * Sets the {@link AuthenticationFailureHandler} used for handling an {@link
+   * OAuth2AuthenticationException} and returning the {@link OAuth2Error Error Response}.
+   *
+   * @param errorResponseHandler the {@link AuthenticationFailureHandler} used for handling an
+   *     {@link OAuth2AuthenticationException}
+   * @return the {@link OAuth2TokenRevocationEndpointConfigurer} for further configuration
+   */
+  public OAuth2TokenRevocationEndpointConfigurer errorResponseHandler(
+      AuthenticationFailureHandler errorResponseHandler) {
+    this.errorResponseHandler = errorResponseHandler;
+    return this;
+  }
 
-	@Override
-	<B extends HttpSecurityBuilder<B>> void init(B builder) {
-		ProviderSettings providerSettings = OAuth2ConfigurerUtils.getProviderSettings(builder);
-		this.requestMatcher = new AntPathRequestMatcher(
-				providerSettings.getTokenRevocationEndpoint(), HttpMethod.POST.name());
+  @Override
+  <B extends HttpSecurityBuilder<B>> void init(B builder) {
+    ProviderSettings providerSettings = OAuth2ConfigurerUtils.getProviderSettings(builder);
+    this.requestMatcher =
+        new AntPathRequestMatcher(
+            providerSettings.getTokenRevocationEndpoint(), HttpMethod.POST.name());
 
-		List<AuthenticationProvider> authenticationProviders =
-				!this.authenticationProviders.isEmpty() ?
-						this.authenticationProviders :
-						createDefaultAuthenticationProviders(builder);
-		authenticationProviders.forEach(authenticationProvider ->
-				builder.authenticationProvider(postProcess(authenticationProvider)));
-	}
+    List<AuthenticationProvider> authenticationProviders =
+        !this.authenticationProviders.isEmpty()
+            ? this.authenticationProviders
+            : createDefaultAuthenticationProviders(builder);
+    authenticationProviders.forEach(
+        authenticationProvider ->
+            builder.authenticationProvider(postProcess(authenticationProvider)));
+  }
 
-	@Override
-	<B extends HttpSecurityBuilder<B>> void configure(B builder) {
-		AuthenticationManager authenticationManager = builder.getSharedObject(AuthenticationManager.class);
-		ProviderSettings providerSettings = OAuth2ConfigurerUtils.getProviderSettings(builder);
+  @Override
+  <B extends HttpSecurityBuilder<B>> void configure(B builder) {
+    AuthenticationManager authenticationManager =
+        builder.getSharedObject(AuthenticationManager.class);
+    ProviderSettings providerSettings = OAuth2ConfigurerUtils.getProviderSettings(builder);
 
-		OAuth2TokenRevocationEndpointFilter revocationEndpointFilter =
-				new OAuth2TokenRevocationEndpointFilter(
-						authenticationManager, providerSettings.getTokenRevocationEndpoint());
-		if (this.revocationRequestConverter != null) {
-			revocationEndpointFilter.setAuthenticationConverter(this.revocationRequestConverter);
-		}
-		if (this.revocationResponseHandler != null) {
-			revocationEndpointFilter.setAuthenticationSuccessHandler(this.revocationResponseHandler);
-		}
-		if (this.errorResponseHandler != null) {
-			revocationEndpointFilter.setAuthenticationFailureHandler(this.errorResponseHandler);
-		}
-		builder.addFilterAfter(postProcess(revocationEndpointFilter), FilterSecurityInterceptor.class);
-	}
+    OAuth2TokenRevocationEndpointFilter revocationEndpointFilter =
+        new OAuth2TokenRevocationEndpointFilter(
+            authenticationManager, providerSettings.getTokenRevocationEndpoint());
+    if (this.revocationRequestConverter != null) {
+      revocationEndpointFilter.setAuthenticationConverter(this.revocationRequestConverter);
+    }
+    if (this.revocationResponseHandler != null) {
+      revocationEndpointFilter.setAuthenticationSuccessHandler(this.revocationResponseHandler);
+    }
+    if (this.errorResponseHandler != null) {
+      revocationEndpointFilter.setAuthenticationFailureHandler(this.errorResponseHandler);
+    }
+    builder.addFilterAfter(postProcess(revocationEndpointFilter), FilterSecurityInterceptor.class);
+  }
 
-	@Override
-	RequestMatcher getRequestMatcher() {
-		return this.requestMatcher;
-	}
+  @Override
+  RequestMatcher getRequestMatcher() {
+    return this.requestMatcher;
+  }
 
-	private <B extends HttpSecurityBuilder<B>> List<AuthenticationProvider> createDefaultAuthenticationProviders(B builder) {
-		List<AuthenticationProvider> authenticationProviders = new ArrayList<>();
+  private <B extends HttpSecurityBuilder<B>>
+      List<AuthenticationProvider> createDefaultAuthenticationProviders(B builder) {
+    List<AuthenticationProvider> authenticationProviders = new ArrayList<>();
 
-		OAuth2TokenRevocationAuthenticationProvider tokenRevocationAuthenticationProvider =
-				new OAuth2TokenRevocationAuthenticationProvider(OAuth2ConfigurerUtils.getAuthorizationService(builder));
-		authenticationProviders.add(tokenRevocationAuthenticationProvider);
+    OAuth2TokenRevocationAuthenticationProvider tokenRevocationAuthenticationProvider =
+        new OAuth2TokenRevocationAuthenticationProvider(
+            OAuth2ConfigurerUtils.getAuthorizationService(builder));
+    authenticationProviders.add(tokenRevocationAuthenticationProvider);
 
-		return authenticationProviders;
-	}
-
+    return authenticationProviders;
+  }
 }

@@ -16,260 +16,268 @@
 package sample.jpa;
 
 import java.time.Instant;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
-/**
- * @author Steve Riesenberg
- */
+/** @author Steve Riesenberg */
 // tag::class[]
 @Entity
 public class Authorization {
-	@Id
-	private String id;
-	private String registeredClientId;
-	private String principalName;
-	private String authorizationGrantType;
-	@Column(length = 4000)
-	private String attributes;
-	@Column(length = 500)
-	private String state;
+  @Id private String id;
+  private String registeredClientId;
+  private String principalName;
+  private String authorizationGrantType;
 
-	@Column(length = 4000)
-	private String authorizationCodeValue;
-	private Instant authorizationCodeIssuedAt;
-	private Instant authorizationCodeExpiresAt;
-	private String authorizationCodeMetadata;
+  @Column(length = 4000)
+  private String attributes;
 
-	@Column(length = 4000)
-	private String accessTokenValue;
-	private Instant accessTokenIssuedAt;
-	private Instant accessTokenExpiresAt;
-	@Column(length = 2000)
-	private String accessTokenMetadata;
-	private String accessTokenType;
-	@Column(length = 1000)
-	private String accessTokenScopes;
+  @Column(length = 500)
+  private String state;
 
-	@Column(length = 4000)
-	private String refreshTokenValue;
-	private Instant refreshTokenIssuedAt;
-	private Instant refreshTokenExpiresAt;
-	@Column(length = 2000)
-	private String refreshTokenMetadata;
+  @Column(length = 4000)
+  private String authorizationCodeValue;
 
-	@Column(length = 4000)
-	private String oidcIdTokenValue;
-	private Instant oidcIdTokenIssuedAt;
-	private Instant oidcIdTokenExpiresAt;
-	@Column(length = 2000)
-	private String oidcIdTokenMetadata;
-	@Column(length = 2000)
-	private String oidcIdTokenClaims;
+  private Instant authorizationCodeIssuedAt;
+  private Instant authorizationCodeExpiresAt;
+  private String authorizationCodeMetadata;
 
-	// getters and setters
-// end::class[]
-	public String getId() {
-		return id;
-	}
+  @Column(length = 4000)
+  private String accessTokenValue;
 
-	public void setId(String id) {
-		this.id = id;
-	}
+  private Instant accessTokenIssuedAt;
+  private Instant accessTokenExpiresAt;
 
-	public String getRegisteredClientId() {
-		return registeredClientId;
-	}
+  @Column(length = 2000)
+  private String accessTokenMetadata;
 
-	public void setRegisteredClientId(String registeredClientId) {
-		this.registeredClientId = registeredClientId;
-	}
+  private String accessTokenType;
 
-	public String getPrincipalName() {
-		return principalName;
-	}
+  @Column(length = 1000)
+  private String accessTokenScopes;
 
-	public void setPrincipalName(String principalName) {
-		this.principalName = principalName;
-	}
+  @Column(length = 4000)
+  private String refreshTokenValue;
 
-	public String getAuthorizationGrantType() {
-		return authorizationGrantType;
-	}
+  private Instant refreshTokenIssuedAt;
+  private Instant refreshTokenExpiresAt;
 
-	public void setAuthorizationGrantType(String authorizationGrantType) {
-		this.authorizationGrantType = authorizationGrantType;
-	}
+  @Column(length = 2000)
+  private String refreshTokenMetadata;
 
-	public String getAttributes() {
-		return attributes;
-	}
+  @Column(length = 4000)
+  private String oidcIdTokenValue;
 
-	public void setAttributes(String attributes) {
-		this.attributes = attributes;
-	}
+  private Instant oidcIdTokenIssuedAt;
+  private Instant oidcIdTokenExpiresAt;
 
-	public String getState() {
-		return state;
-	}
+  @Column(length = 2000)
+  private String oidcIdTokenMetadata;
 
-	public void setState(String state) {
-		this.state = state;
-	}
+  @Column(length = 2000)
+  private String oidcIdTokenClaims;
 
-	public String getAuthorizationCodeValue() {
-		return authorizationCodeValue;
-	}
+  // getters and setters
+  // end::class[]
+  public String getId() {
+    return id;
+  }
 
-	public void setAuthorizationCodeValue(String authorizationCode) {
-		this.authorizationCodeValue = authorizationCode;
-	}
+  public void setId(String id) {
+    this.id = id;
+  }
 
-	public Instant getAuthorizationCodeIssuedAt() {
-		return authorizationCodeIssuedAt;
-	}
+  public String getRegisteredClientId() {
+    return registeredClientId;
+  }
 
-	public void setAuthorizationCodeIssuedAt(Instant authorizationCodeIssuedAt) {
-		this.authorizationCodeIssuedAt = authorizationCodeIssuedAt;
-	}
+  public void setRegisteredClientId(String registeredClientId) {
+    this.registeredClientId = registeredClientId;
+  }
 
-	public Instant getAuthorizationCodeExpiresAt() {
-		return authorizationCodeExpiresAt;
-	}
+  public String getPrincipalName() {
+    return principalName;
+  }
 
-	public void setAuthorizationCodeExpiresAt(Instant authorizationCodeExpiresAt) {
-		this.authorizationCodeExpiresAt = authorizationCodeExpiresAt;
-	}
+  public void setPrincipalName(String principalName) {
+    this.principalName = principalName;
+  }
 
-	public String getAuthorizationCodeMetadata() {
-		return authorizationCodeMetadata;
-	}
+  public String getAuthorizationGrantType() {
+    return authorizationGrantType;
+  }
 
-	public void setAuthorizationCodeMetadata(String authorizationCodeMetadata) {
-		this.authorizationCodeMetadata = authorizationCodeMetadata;
-	}
+  public void setAuthorizationGrantType(String authorizationGrantType) {
+    this.authorizationGrantType = authorizationGrantType;
+  }
 
-	public String getAccessTokenValue() {
-		return accessTokenValue;
-	}
+  public String getAttributes() {
+    return attributes;
+  }
 
-	public void setAccessTokenValue(String accessToken) {
-		this.accessTokenValue = accessToken;
-	}
+  public void setAttributes(String attributes) {
+    this.attributes = attributes;
+  }
 
-	public Instant getAccessTokenIssuedAt() {
-		return accessTokenIssuedAt;
-	}
+  public String getState() {
+    return state;
+  }
 
-	public void setAccessTokenIssuedAt(Instant accessTokenIssuedAt) {
-		this.accessTokenIssuedAt = accessTokenIssuedAt;
-	}
+  public void setState(String state) {
+    this.state = state;
+  }
 
-	public Instant getAccessTokenExpiresAt() {
-		return accessTokenExpiresAt;
-	}
+  public String getAuthorizationCodeValue() {
+    return authorizationCodeValue;
+  }
 
-	public void setAccessTokenExpiresAt(Instant accessTokenExpiresAt) {
-		this.accessTokenExpiresAt = accessTokenExpiresAt;
-	}
+  public void setAuthorizationCodeValue(String authorizationCode) {
+    this.authorizationCodeValue = authorizationCode;
+  }
 
-	public String getAccessTokenMetadata() {
-		return accessTokenMetadata;
-	}
+  public Instant getAuthorizationCodeIssuedAt() {
+    return authorizationCodeIssuedAt;
+  }
 
-	public void setAccessTokenMetadata(String accessTokenMetadata) {
-		this.accessTokenMetadata = accessTokenMetadata;
-	}
+  public void setAuthorizationCodeIssuedAt(Instant authorizationCodeIssuedAt) {
+    this.authorizationCodeIssuedAt = authorizationCodeIssuedAt;
+  }
 
-	public String getAccessTokenType() {
-		return accessTokenType;
-	}
+  public Instant getAuthorizationCodeExpiresAt() {
+    return authorizationCodeExpiresAt;
+  }
 
-	public void setAccessTokenType(String accessTokenType) {
-		this.accessTokenType = accessTokenType;
-	}
+  public void setAuthorizationCodeExpiresAt(Instant authorizationCodeExpiresAt) {
+    this.authorizationCodeExpiresAt = authorizationCodeExpiresAt;
+  }
 
-	public String getAccessTokenScopes() {
-		return accessTokenScopes;
-	}
+  public String getAuthorizationCodeMetadata() {
+    return authorizationCodeMetadata;
+  }
 
-	public void setAccessTokenScopes(String accessTokenScopes) {
-		this.accessTokenScopes = accessTokenScopes;
-	}
+  public void setAuthorizationCodeMetadata(String authorizationCodeMetadata) {
+    this.authorizationCodeMetadata = authorizationCodeMetadata;
+  }
 
-	public String getRefreshTokenValue() {
-		return refreshTokenValue;
-	}
+  public String getAccessTokenValue() {
+    return accessTokenValue;
+  }
 
-	public void setRefreshTokenValue(String refreshToken) {
-		this.refreshTokenValue = refreshToken;
-	}
+  public void setAccessTokenValue(String accessToken) {
+    this.accessTokenValue = accessToken;
+  }
 
-	public Instant getRefreshTokenIssuedAt() {
-		return refreshTokenIssuedAt;
-	}
+  public Instant getAccessTokenIssuedAt() {
+    return accessTokenIssuedAt;
+  }
 
-	public void setRefreshTokenIssuedAt(Instant refreshTokenIssuedAt) {
-		this.refreshTokenIssuedAt = refreshTokenIssuedAt;
-	}
+  public void setAccessTokenIssuedAt(Instant accessTokenIssuedAt) {
+    this.accessTokenIssuedAt = accessTokenIssuedAt;
+  }
 
-	public Instant getRefreshTokenExpiresAt() {
-		return refreshTokenExpiresAt;
-	}
+  public Instant getAccessTokenExpiresAt() {
+    return accessTokenExpiresAt;
+  }
 
-	public void setRefreshTokenExpiresAt(Instant refreshTokenExpiresAt) {
-		this.refreshTokenExpiresAt = refreshTokenExpiresAt;
-	}
+  public void setAccessTokenExpiresAt(Instant accessTokenExpiresAt) {
+    this.accessTokenExpiresAt = accessTokenExpiresAt;
+  }
 
-	public String getRefreshTokenMetadata() {
-		return refreshTokenMetadata;
-	}
+  public String getAccessTokenMetadata() {
+    return accessTokenMetadata;
+  }
 
-	public void setRefreshTokenMetadata(String refreshTokenMetadata) {
-		this.refreshTokenMetadata = refreshTokenMetadata;
-	}
+  public void setAccessTokenMetadata(String accessTokenMetadata) {
+    this.accessTokenMetadata = accessTokenMetadata;
+  }
 
-	public String getOidcIdTokenValue() {
-		return oidcIdTokenValue;
-	}
+  public String getAccessTokenType() {
+    return accessTokenType;
+  }
 
-	public void setOidcIdTokenValue(String idToken) {
-		this.oidcIdTokenValue = idToken;
-	}
+  public void setAccessTokenType(String accessTokenType) {
+    this.accessTokenType = accessTokenType;
+  }
 
-	public Instant getOidcIdTokenIssuedAt() {
-		return oidcIdTokenIssuedAt;
-	}
+  public String getAccessTokenScopes() {
+    return accessTokenScopes;
+  }
 
-	public void setOidcIdTokenIssuedAt(Instant idTokenIssuedAt) {
-		this.oidcIdTokenIssuedAt = idTokenIssuedAt;
-	}
+  public void setAccessTokenScopes(String accessTokenScopes) {
+    this.accessTokenScopes = accessTokenScopes;
+  }
 
-	public Instant getOidcIdTokenExpiresAt() {
-		return oidcIdTokenExpiresAt;
-	}
+  public String getRefreshTokenValue() {
+    return refreshTokenValue;
+  }
 
-	public void setOidcIdTokenExpiresAt(Instant idTokenExpiresAt) {
-		this.oidcIdTokenExpiresAt = idTokenExpiresAt;
-	}
+  public void setRefreshTokenValue(String refreshToken) {
+    this.refreshTokenValue = refreshToken;
+  }
 
-	public String getOidcIdTokenMetadata() {
-		return oidcIdTokenMetadata;
-	}
+  public Instant getRefreshTokenIssuedAt() {
+    return refreshTokenIssuedAt;
+  }
 
-	public void setOidcIdTokenMetadata(String idTokenMetadata) {
-		this.oidcIdTokenMetadata = idTokenMetadata;
-	}
+  public void setRefreshTokenIssuedAt(Instant refreshTokenIssuedAt) {
+    this.refreshTokenIssuedAt = refreshTokenIssuedAt;
+  }
 
-	public String getOidcIdTokenClaims() {
-		return oidcIdTokenClaims;
-	}
+  public Instant getRefreshTokenExpiresAt() {
+    return refreshTokenExpiresAt;
+  }
 
-	public void setOidcIdTokenClaims(String idTokenClaims) {
-		this.oidcIdTokenClaims = idTokenClaims;
-	}
-// tag::class[]
+  public void setRefreshTokenExpiresAt(Instant refreshTokenExpiresAt) {
+    this.refreshTokenExpiresAt = refreshTokenExpiresAt;
+  }
+
+  public String getRefreshTokenMetadata() {
+    return refreshTokenMetadata;
+  }
+
+  public void setRefreshTokenMetadata(String refreshTokenMetadata) {
+    this.refreshTokenMetadata = refreshTokenMetadata;
+  }
+
+  public String getOidcIdTokenValue() {
+    return oidcIdTokenValue;
+  }
+
+  public void setOidcIdTokenValue(String idToken) {
+    this.oidcIdTokenValue = idToken;
+  }
+
+  public Instant getOidcIdTokenIssuedAt() {
+    return oidcIdTokenIssuedAt;
+  }
+
+  public void setOidcIdTokenIssuedAt(Instant idTokenIssuedAt) {
+    this.oidcIdTokenIssuedAt = idTokenIssuedAt;
+  }
+
+  public Instant getOidcIdTokenExpiresAt() {
+    return oidcIdTokenExpiresAt;
+  }
+
+  public void setOidcIdTokenExpiresAt(Instant idTokenExpiresAt) {
+    this.oidcIdTokenExpiresAt = idTokenExpiresAt;
+  }
+
+  public String getOidcIdTokenMetadata() {
+    return oidcIdTokenMetadata;
+  }
+
+  public void setOidcIdTokenMetadata(String idTokenMetadata) {
+    this.oidcIdTokenMetadata = idTokenMetadata;
+  }
+
+  public String getOidcIdTokenClaims() {
+    return oidcIdTokenClaims;
+  }
+
+  public void setOidcIdTokenClaims(String idTokenClaims) {
+    this.oidcIdTokenClaims = idTokenClaims;
+  }
+  // tag::class[]
 }
 // end::class[]

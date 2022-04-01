@@ -18,7 +18,6 @@ package org.springframework.security.oauth2.server.authorization.token;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-
 import org.springframework.lang.Nullable;
 import org.springframework.security.oauth2.server.authorization.OAuth2TokenContext;
 import org.springframework.util.Assert;
@@ -31,51 +30,46 @@ import org.springframework.util.Assert;
  * @see OAuth2TokenContext
  */
 public final class DefaultOAuth2TokenContext implements OAuth2TokenContext {
-	private final Map<Object, Object> context;
+  private final Map<Object, Object> context;
 
-	private DefaultOAuth2TokenContext(Map<Object, Object> context) {
-		this.context = Collections.unmodifiableMap(new HashMap<>(context));
-	}
+  private DefaultOAuth2TokenContext(Map<Object, Object> context) {
+    this.context = Collections.unmodifiableMap(new HashMap<>(context));
+  }
 
-	@SuppressWarnings("unchecked")
-	@Nullable
-	@Override
-	public <V> V get(Object key) {
-		return hasKey(key) ? (V) this.context.get(key) : null;
-	}
+  @SuppressWarnings("unchecked")
+  @Nullable
+  @Override
+  public <V> V get(Object key) {
+    return hasKey(key) ? (V) this.context.get(key) : null;
+  }
 
-	@Override
-	public boolean hasKey(Object key) {
-		Assert.notNull(key, "key cannot be null");
-		return this.context.containsKey(key);
-	}
+  @Override
+  public boolean hasKey(Object key) {
+    Assert.notNull(key, "key cannot be null");
+    return this.context.containsKey(key);
+  }
 
-	/**
-	 * Returns a new {@link Builder}.
-	 *
-	 * @return the {@link Builder}
-	 */
-	public static Builder builder() {
-		return new Builder();
-	}
+  /**
+   * Returns a new {@link Builder}.
+   *
+   * @return the {@link Builder}
+   */
+  public static Builder builder() {
+    return new Builder();
+  }
 
-	/**
-	 * A builder for {@link DefaultOAuth2TokenContext}.
-	 */
-	public static final class Builder extends AbstractBuilder<DefaultOAuth2TokenContext, Builder> {
+  /** A builder for {@link DefaultOAuth2TokenContext}. */
+  public static final class Builder extends AbstractBuilder<DefaultOAuth2TokenContext, Builder> {
 
-		private Builder() {
-		}
+    private Builder() {}
 
-		/**
-		 * Builds a new {@link DefaultOAuth2TokenContext}.
-		 *
-		 * @return the {@link DefaultOAuth2TokenContext}
-		 */
-		public DefaultOAuth2TokenContext build() {
-			return new DefaultOAuth2TokenContext(getContext());
-		}
-
-	}
-
+    /**
+     * Builds a new {@link DefaultOAuth2TokenContext}.
+     *
+     * @return the {@link DefaultOAuth2TokenContext}
+     */
+    public DefaultOAuth2TokenContext build() {
+      return new DefaultOAuth2TokenContext(getContext());
+    }
+  }
 }

@@ -15,9 +15,6 @@
  */
 package org.springframework.security.config.annotation.web.configuration;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.JWSKeySelector;
@@ -25,7 +22,8 @@ import com.nimbusds.jose.proc.JWSVerificationKeySelector;
 import com.nimbusds.jose.proc.SecurityContext;
 import com.nimbusds.jwt.proc.ConfigurableJWTProcessor;
 import com.nimbusds.jwt.proc.DefaultJWTProcessor;
-
+import java.util.HashSet;
+import java.util.Set;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
@@ -48,50 +46,46 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 @Configuration(proxyBeanMethods = false)
 public class OAuth2AuthorizationServerConfiguration {
 
-	@Bean
-	@Order(Ordered.HIGHEST_PRECEDENCE)
-	public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http) throws Exception {
-		applyDefaultSecurity(http);
-		return http.build();
-	}
+  @Bean
+  @Order(Ordered.HIGHEST_PRECEDENCE)
+  public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http)
+      throws Exception {
+    applyDefaultSecurity(http);
+    return http.build();
+  }
 
-	// @formatter:off
-	public static void applyDefaultSecurity(HttpSecurity http) throws Exception {
-		OAuth2AuthorizationServerConfigurer<HttpSecurity> authorizationServerConfigurer =
-				new OAuth2AuthorizationServerConfigurer<>();
-		RequestMatcher endpointsMatcher = authorizationServerConfigurer
-				.getEndpointsMatcher();
+  // @formatter:off
+  public static void applyDefaultSecurity(HttpSecurity http) throws Exception {
+    OAuth2AuthorizationServerConfigurer<HttpSecurity> authorizationServerConfigurer =
+        new OAuth2AuthorizationServerConfigurer<>();
+    RequestMatcher endpointsMatcher = authorizationServerConfigurer.getEndpointsMatcher();
 
-		http
-			.requestMatcher(endpointsMatcher)
-			.authorizeRequests(authorizeRequests ->
-				authorizeRequests.anyRequest().authenticated()
-			)
-			.csrf(csrf -> csrf.ignoringRequestMatchers(endpointsMatcher))
-			.apply(authorizationServerConfigurer);
-	}
-	// @formatter:on
+    http.requestMatcher(endpointsMatcher)
+        .authorizeRequests(authorizeRequests -> authorizeRequests.anyRequest().authenticated())
+        .csrf(csrf -> csrf.ignoringRequestMatchers(endpointsMatcher))
+        .apply(authorizationServerConfigurer);
+  }
+  // @formatter:on
 
-	public static JwtDecoder jwtDecoder(JWKSource<SecurityContext> jwkSource) {
-		Set<JWSAlgorithm> jwsAlgs = new HashSet<>();
-		jwsAlgs.addAll(JWSAlgorithm.Family.RSA);
-		jwsAlgs.addAll(JWSAlgorithm.Family.EC);
-		jwsAlgs.addAll(JWSAlgorithm.Family.HMAC_SHA);
-		ConfigurableJWTProcessor<SecurityContext> jwtProcessor = new DefaultJWTProcessor<>();
-		JWSKeySelector<SecurityContext> jwsKeySelector =
-				new JWSVerificationKeySelector<>(jwsAlgs, jwkSource);
-		jwtProcessor.setJWSKeySelector(jwsKeySelector);
-		// Override the default Nimbus claims set verifier as NimbusJwtDecoder handles it instead
-		jwtProcessor.setJWTClaimsSetVerifier((claims, context) -> {
-		});
-		return new NimbusJwtDecoder(jwtProcessor);
-	}
+  public static JwtDecoder jwtDecoder(JWKSource<SecurityContext> jwkSource) {
+    Set<JWSAlgorithm> jwsAlgs = new HashSet<>();
+    jwsAlgs.addAll(JWSAlgorithm.Family.RSA);
+    jwsAlgs.addAll(JWSAlgorithm.Family.EC);
+    jwsAlgs.addAll(JWSAlgorithm.Family.HMAC_SHA);
+    ConfigurableJWTProcessor<SecurityContext> jwtProcessor = new DefaultJWTProcessor<>();
+    JWSKeySelector<SecurityContext> jwsKeySelector =
+        new JWSVerificationKeySelector<>(jwsAlgs, jwkSource);
+    jwtProcessor.setJWSKeySelector(jwsKeySelector);
+    // Override the default Nimbus claims set verifier as NimbusJwtDecoder handles it instead
+    jwtProcessor.setJWTClaimsSetVerifier((claims, context) -> {});
+    return new NimbusJwtDecoder(jwtProcessor);
+  }
 
-	@Bean
-	RegisterMissingBeanPostProcessor registerMissingBeanPostProcessor() {
-		RegisterMissingBeanPostProcessor postProcessor = new RegisterMissingBeanPostProcessor();
-		postProcessor.addBeanDefinition(ProviderSettings.class, () -> ProviderSettings.builder().build());
-		return postProcessor;
-	}
-
+  @Bean
+  RegisterMissingBeanPostProcessor registerMissingBeanPostProcessor() {
+    RegisterMissingBeanPostProcessor postProcessor = new RegisterMissingBeanPostProcessor();
+    postProcessor.addBeanDefinition(
+        ProviderSettings.class, () -> ProviderSettings.builder().build());
+    return postProcessor;
+  }
 }
