@@ -15,19 +15,17 @@
  */
 package org.springframework.security.oauth2.server.authorization.authentication;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
-
 import org.junit.Test;
-
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
 import org.springframework.security.oauth2.server.authorization.client.TestRegisteredClients;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * Tests for {@link OAuth2RefreshTokenAuthenticationToken}.
@@ -36,38 +34,51 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  * @since 0.0.3
  */
 public class OAuth2RefreshTokenAuthenticationTokenTests {
-	private RegisteredClient registeredClient = TestRegisteredClients.registeredClient().build();
-	private OAuth2ClientAuthenticationToken clientPrincipal = new OAuth2ClientAuthenticationToken(
-			this.registeredClient, ClientAuthenticationMethod.CLIENT_SECRET_BASIC, this.registeredClient.getClientSecret());
-	private Set<String> scopes = Collections.singleton("scope1");
-	private Map<String, Object> additionalParameters = Collections.singletonMap("param1", "value1");
+  private RegisteredClient registeredClient = TestRegisteredClients.registeredClient().build();
+  private OAuth2ClientAuthenticationToken clientPrincipal =
+      new OAuth2ClientAuthenticationToken(
+          this.registeredClient,
+          ClientAuthenticationMethod.CLIENT_SECRET_BASIC,
+          this.registeredClient.getClientSecret());
+  private Set<String> scopes = Collections.singleton("scope1");
+  private Map<String, Object> additionalParameters = Collections.singletonMap("param1", "value1");
 
-	@Test
-	public void constructorWhenRefreshTokenNullOrEmptyThenThrowIllegalArgumentException() {
-		assertThatThrownBy(() -> new OAuth2RefreshTokenAuthenticationToken(null, this.clientPrincipal, this.scopes, this.additionalParameters))
-				.isInstanceOf(IllegalArgumentException.class)
-				.hasMessage("refreshToken cannot be empty");
-		assertThatThrownBy(() -> new OAuth2RefreshTokenAuthenticationToken("", this.clientPrincipal, this.scopes, this.additionalParameters))
-				.isInstanceOf(IllegalArgumentException.class)
-				.hasMessage("refreshToken cannot be empty");
-	}
+  @Test
+  public void constructorWhenRefreshTokenNullOrEmptyThenThrowIllegalArgumentException() {
+    assertThatThrownBy(
+            () ->
+                new OAuth2RefreshTokenAuthenticationToken(
+                    null, this.clientPrincipal, this.scopes, this.additionalParameters))
+        .isInstanceOf(IllegalArgumentException.class)
+        .hasMessage("refreshToken cannot be empty");
+    assertThatThrownBy(
+            () ->
+                new OAuth2RefreshTokenAuthenticationToken(
+                    "", this.clientPrincipal, this.scopes, this.additionalParameters))
+        .isInstanceOf(IllegalArgumentException.class)
+        .hasMessage("refreshToken cannot be empty");
+  }
 
-	@Test
-	public void constructorWhenClientPrincipalNullThenThrowIllegalArgumentException() {
-		assertThatThrownBy(() -> new OAuth2RefreshTokenAuthenticationToken("refresh-token", null, this.scopes, this.additionalParameters))
-				.isInstanceOf(IllegalArgumentException.class)
-				.hasMessage("clientPrincipal cannot be null");
-	}
+  @Test
+  public void constructorWhenClientPrincipalNullThenThrowIllegalArgumentException() {
+    assertThatThrownBy(
+            () ->
+                new OAuth2RefreshTokenAuthenticationToken(
+                    "refresh-token", null, this.scopes, this.additionalParameters))
+        .isInstanceOf(IllegalArgumentException.class)
+        .hasMessage("clientPrincipal cannot be null");
+  }
 
-	@Test
-	public void constructorWhenScopesProvidedThenCreated() {
-		OAuth2RefreshTokenAuthenticationToken authentication = new OAuth2RefreshTokenAuthenticationToken(
-				"refresh-token", this.clientPrincipal, this.scopes, this.additionalParameters);
-		assertThat(authentication.getGrantType()).isEqualTo(AuthorizationGrantType.REFRESH_TOKEN);
-		assertThat(authentication.getRefreshToken()).isEqualTo("refresh-token");
-		assertThat(authentication.getPrincipal()).isEqualTo(this.clientPrincipal);
-		assertThat(authentication.getCredentials().toString()).isEmpty();
-		assertThat(authentication.getScopes()).isEqualTo(this.scopes);
-		assertThat(authentication.getAdditionalParameters()).isEqualTo(this.additionalParameters);
-	}
+  @Test
+  public void constructorWhenScopesProvidedThenCreated() {
+    OAuth2RefreshTokenAuthenticationToken authentication =
+        new OAuth2RefreshTokenAuthenticationToken(
+            "refresh-token", this.clientPrincipal, this.scopes, this.additionalParameters);
+    assertThat(authentication.getGrantType()).isEqualTo(AuthorizationGrantType.REFRESH_TOKEN);
+    assertThat(authentication.getRefreshToken()).isEqualTo("refresh-token");
+    assertThat(authentication.getPrincipal()).isEqualTo(this.clientPrincipal);
+    assertThat(authentication.getCredentials().toString()).isEmpty();
+    assertThat(authentication.getScopes()).isEqualTo(this.scopes);
+    assertThat(authentication.getAdditionalParameters()).isEqualTo(this.additionalParameters);
+  }
 }

@@ -15,18 +15,16 @@
  */
 package org.springframework.security.oauth2.core.oidc;
 
-
 import java.net.URL;
 import java.util.List;
-
 import org.springframework.security.oauth2.core.ClaimAccessor;
 import org.springframework.security.oauth2.core.OAuth2AuthorizationServerMetadataClaimAccessor;
 import org.springframework.security.oauth2.jose.jws.JwsAlgorithm;
 import org.springframework.security.oauth2.jwt.Jwt;
 
 /**
- * A {@link ClaimAccessor} for the "claims" that can be returned
- * in the OpenID Provider Configuration Response.
+ * A {@link ClaimAccessor} for the "claims" that can be returned in the OpenID Provider
+ * Configuration Response.
  *
  * @author Daniel Garnier-Moiroux
  * @since 0.1.0
@@ -34,37 +32,42 @@ import org.springframework.security.oauth2.jwt.Jwt;
  * @see OAuth2AuthorizationServerMetadataClaimAccessor
  * @see OidcProviderMetadataClaimNames
  * @see OidcProviderConfiguration
- * @see <a target="_blank" href="https://openid.net/specs/openid-connect-discovery-1_0.html#ProviderMetadata">3. OpenID Provider Metadata</a>
+ * @see <a target="_blank"
+ *     href="https://openid.net/specs/openid-connect-discovery-1_0.html#ProviderMetadata">3. OpenID
+ *     Provider Metadata</a>
  */
-public interface OidcProviderMetadataClaimAccessor extends OAuth2AuthorizationServerMetadataClaimAccessor {
+public interface OidcProviderMetadataClaimAccessor
+    extends OAuth2AuthorizationServerMetadataClaimAccessor {
 
-	/**
-	 * Returns the Subject Identifier types supported {@code (subject_types_supported)}.
-	 *
-	 * @return the Subject Identifier types supported
-	 */
-	default List<String> getSubjectTypes() {
-		return getClaimAsStringList(OidcProviderMetadataClaimNames.SUBJECT_TYPES_SUPPORTED);
-	}
+  /**
+   * Returns the Subject Identifier types supported {@code (subject_types_supported)}.
+   *
+   * @return the Subject Identifier types supported
+   */
+  default List<String> getSubjectTypes() {
+    return getClaimAsStringList(OidcProviderMetadataClaimNames.SUBJECT_TYPES_SUPPORTED);
+  }
 
-	/**
-	 * Returns the {@link JwsAlgorithm JWS} signing algorithms supported for the {@link OidcIdToken ID Token}
-	 * to encode the claims in a {@link Jwt} {@code (id_token_signing_alg_values_supported)}.
-	 *
-	 * @return the {@link JwsAlgorithm JWS} signing algorithms supported for the {@link OidcIdToken ID Token}
-	 */
-	default List<String> getIdTokenSigningAlgorithms() {
-		return getClaimAsStringList(OidcProviderMetadataClaimNames.ID_TOKEN_SIGNING_ALG_VALUES_SUPPORTED);
-	}
+  /**
+   * Returns the {@link JwsAlgorithm JWS} signing algorithms supported for the {@link OidcIdToken ID
+   * Token} to encode the claims in a {@link Jwt} {@code (id_token_signing_alg_values_supported)}.
+   *
+   * @return the {@link JwsAlgorithm JWS} signing algorithms supported for the {@link OidcIdToken ID
+   *     Token}
+   */
+  default List<String> getIdTokenSigningAlgorithms() {
+    return getClaimAsStringList(
+        OidcProviderMetadataClaimNames.ID_TOKEN_SIGNING_ALG_VALUES_SUPPORTED);
+  }
 
-	/**
-	 * Returns the {@code URL} of the OpenID Connect 1.0 UserInfo Endpoint {@code (userinfo_endpoint)}.
-	 *
-	 * @return the {@code URL} of the OpenID Connect 1.0 UserInfo Endpoint
-	 * @since 0.2.2
-	 */
-	default URL getUserInfoEndpoint() {
-		return getClaimAsURL(OidcProviderMetadataClaimNames.USER_INFO_ENDPOINT);
-	}
-
+  /**
+   * Returns the {@code URL} of the OpenID Connect 1.0 UserInfo Endpoint {@code
+   * (userinfo_endpoint)}.
+   *
+   * @return the {@code URL} of the OpenID Connect 1.0 UserInfo Endpoint
+   * @since 0.2.2
+   */
+  default URL getUserInfoEndpoint() {
+    return getClaimAsURL(OidcProviderMetadataClaimNames.USER_INFO_ENDPOINT);
+  }
 }

@@ -18,7 +18,6 @@ package org.springframework.security.oauth2.server.authorization.token;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Collections;
-
 import org.springframework.lang.Nullable;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
@@ -43,8 +42,8 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * An {@link OAuth2TokenGenerator} that generates a {@link Jwt}
- * used for an {@link OAuth2AccessToken} or {@link OidcIdToken}.
+ * An {@link OAuth2TokenGenerator} that generates a {@link Jwt} used for an {@link
+ * OAuth2AccessToken} or {@link OidcIdToken}.
  *
  * @author Joe Grandja
  * @since 0.2.3
@@ -57,117 +56,120 @@ import org.springframework.util.StringUtils;
  * @see OidcIdToken
  */
 public final class JwtGenerator implements OAuth2TokenGenerator<Jwt> {
-	private final JwtEncoder jwtEncoder;
-	private OAuth2TokenCustomizer<JwtEncodingContext> jwtCustomizer;
+  private final JwtEncoder jwtEncoder;
+  private OAuth2TokenCustomizer<JwtEncodingContext> jwtCustomizer;
 
-	/**
-	 * Constructs a {@code JwtGenerator} using the provided parameters.
-	 *
-	 * @param jwtEncoder the jwt encoder
-	 */
-	public JwtGenerator(JwtEncoder jwtEncoder) {
-		Assert.notNull(jwtEncoder, "jwtEncoder cannot be null");
-		this.jwtEncoder = jwtEncoder;
-	}
+  /**
+   * Constructs a {@code JwtGenerator} using the provided parameters.
+   *
+   * @param jwtEncoder the jwt encoder
+   */
+  public JwtGenerator(JwtEncoder jwtEncoder) {
+    Assert.notNull(jwtEncoder, "jwtEncoder cannot be null");
+    this.jwtEncoder = jwtEncoder;
+  }
 
-	@Nullable
-	@Override
-	public Jwt generate(OAuth2TokenContext context) {
-		if (context.getTokenType() == null ||
-				(!OAuth2TokenType.ACCESS_TOKEN.equals(context.getTokenType()) &&
-						!OidcParameterNames.ID_TOKEN.equals(context.getTokenType().getValue()))) {
-			return null;
-		}
-		if (OAuth2TokenType.ACCESS_TOKEN.equals(context.getTokenType()) &&
-				!OAuth2TokenFormat.SELF_CONTAINED.equals(context.getRegisteredClient().getTokenSettings().getAccessTokenFormat())) {
-			return null;
-		}
+  @Nullable
+  @Override
+  public Jwt generate(OAuth2TokenContext context) {
+    if (context.getTokenType() == null
+        || (!OAuth2TokenType.ACCESS_TOKEN.equals(context.getTokenType())
+            && !OidcParameterNames.ID_TOKEN.equals(context.getTokenType().getValue()))) {
+      return null;
+    }
+    if (OAuth2TokenType.ACCESS_TOKEN.equals(context.getTokenType())
+        && !OAuth2TokenFormat.SELF_CONTAINED.equals(
+            context.getRegisteredClient().getTokenSettings().getAccessTokenFormat())) {
+      return null;
+    }
 
-		String issuer = null;
-		if (context.getProviderContext() != null) {
-			issuer = context.getProviderContext().getIssuer();
-		}
-		RegisteredClient registeredClient = context.getRegisteredClient();
+    String issuer = null;
+    if (context.getProviderContext() != null) {
+      issuer = context.getProviderContext().getIssuer();
+    }
+    RegisteredClient registeredClient = context.getRegisteredClient();
 
-		Instant issuedAt = Instant.now();
-		Instant expiresAt;
-		if (OidcParameterNames.ID_TOKEN.equals(context.getTokenType().getValue())) {
-			// TODO Allow configuration for ID Token time-to-live
-			expiresAt = issuedAt.plus(30, ChronoUnit.MINUTES);
-		} else {
-			expiresAt = issuedAt.plus(registeredClient.getTokenSettings().getAccessTokenTimeToLive());
-		}
+    Instant issuedAt = Instant.now();
+    Instant expiresAt;
+    if (OidcParameterNames.ID_TOKEN.equals(context.getTokenType().getValue())) {
+      // TODO Allow configuration for ID Token time-to-live
+      expiresAt = issuedAt.plus(30, ChronoUnit.MINUTES);
+    } else {
+      expiresAt = issuedAt.plus(registeredClient.getTokenSettings().getAccessTokenTimeToLive());
+    }
 
-		// @formatter:off
-		JwtClaimsSet.Builder claimsBuilder = JwtClaimsSet.builder();
-		if (StringUtils.hasText(issuer)) {
-			claimsBuilder.issuer(issuer);
-		}
-		claimsBuilder
-				.subject(context.getPrincipal().getName())
-				.audience(Collections.singletonList(registeredClient.getClientId()))
-				.issuedAt(issuedAt)
-				.expiresAt(expiresAt);
-		if (OAuth2TokenType.ACCESS_TOKEN.equals(context.getTokenType())) {
-			claimsBuilder.notBefore(issuedAt);
-			if (!CollectionUtils.isEmpty(context.getAuthorizedScopes())) {
-				claimsBuilder.claim(OAuth2ParameterNames.SCOPE, context.getAuthorizedScopes());
-			}
-		} else if (OidcParameterNames.ID_TOKEN.equals(context.getTokenType().getValue())) {
-			claimsBuilder.claim(IdTokenClaimNames.AZP, registeredClient.getClientId());
-			if (AuthorizationGrantType.AUTHORIZATION_CODE.equals(context.getAuthorizationGrantType())) {
-				OAuth2AuthorizationRequest authorizationRequest = context.getAuthorization().getAttribute(
-						OAuth2AuthorizationRequest.class.getName());
-				String nonce = (String) authorizationRequest.getAdditionalParameters().get(OidcParameterNames.NONCE);
-				if (StringUtils.hasText(nonce)) {
-					claimsBuilder.claim(IdTokenClaimNames.NONCE, nonce);
-				}
-			}
-			// TODO Add 'auth_time' claim
-		}
-		// @formatter:on
+    // @formatter:off
+    JwtClaimsSet.Builder claimsBuilder = JwtClaimsSet.builder();
+    if (StringUtils.hasText(issuer)) {
+      claimsBuilder.issuer(issuer);
+    }
+    claimsBuilder
+        .subject(context.getPrincipal().getName())
+        .audience(Collections.singletonList(registeredClient.getClientId()))
+        .issuedAt(issuedAt)
+        .expiresAt(expiresAt);
+    if (OAuth2TokenType.ACCESS_TOKEN.equals(context.getTokenType())) {
+      claimsBuilder.notBefore(issuedAt);
+      if (!CollectionUtils.isEmpty(context.getAuthorizedScopes())) {
+        claimsBuilder.claim(OAuth2ParameterNames.SCOPE, context.getAuthorizedScopes());
+      }
+    } else if (OidcParameterNames.ID_TOKEN.equals(context.getTokenType().getValue())) {
+      claimsBuilder.claim(IdTokenClaimNames.AZP, registeredClient.getClientId());
+      if (AuthorizationGrantType.AUTHORIZATION_CODE.equals(context.getAuthorizationGrantType())) {
+        OAuth2AuthorizationRequest authorizationRequest =
+            context.getAuthorization().getAttribute(OAuth2AuthorizationRequest.class.getName());
+        String nonce =
+            (String) authorizationRequest.getAdditionalParameters().get(OidcParameterNames.NONCE);
+        if (StringUtils.hasText(nonce)) {
+          claimsBuilder.claim(IdTokenClaimNames.NONCE, nonce);
+        }
+      }
+      // TODO Add 'auth_time' claim
+    }
+    // @formatter:on
 
-		JoseHeader.Builder headersBuilder = JoseHeader.withAlgorithm(SignatureAlgorithm.RS256);
+    JoseHeader.Builder headersBuilder = JoseHeader.withAlgorithm(SignatureAlgorithm.RS256);
 
-		if (this.jwtCustomizer != null) {
-			// @formatter:off
-			JwtEncodingContext.Builder jwtContextBuilder = JwtEncodingContext.with(headersBuilder, claimsBuilder)
-					.registeredClient(context.getRegisteredClient())
-					.principal(context.getPrincipal())
-					.providerContext(context.getProviderContext())
-					.authorizedScopes(context.getAuthorizedScopes())
-					.tokenType(context.getTokenType())
-					.authorizationGrantType(context.getAuthorizationGrantType());
-			if (context.getAuthorization() != null) {
-				jwtContextBuilder.authorization(context.getAuthorization());
-			}
-			if (context.getAuthorizationGrant() != null) {
-				jwtContextBuilder.authorizationGrant(context.getAuthorizationGrant());
-			}
-			// @formatter:on
+    if (this.jwtCustomizer != null) {
+      // @formatter:off
+      JwtEncodingContext.Builder jwtContextBuilder =
+          JwtEncodingContext.with(headersBuilder, claimsBuilder)
+              .registeredClient(context.getRegisteredClient())
+              .principal(context.getPrincipal())
+              .providerContext(context.getProviderContext())
+              .authorizedScopes(context.getAuthorizedScopes())
+              .tokenType(context.getTokenType())
+              .authorizationGrantType(context.getAuthorizationGrantType());
+      if (context.getAuthorization() != null) {
+        jwtContextBuilder.authorization(context.getAuthorization());
+      }
+      if (context.getAuthorizationGrant() != null) {
+        jwtContextBuilder.authorizationGrant(context.getAuthorizationGrant());
+      }
+      // @formatter:on
 
-			JwtEncodingContext jwtContext = jwtContextBuilder.build();
-			this.jwtCustomizer.customize(jwtContext);
-		}
+      JwtEncodingContext jwtContext = jwtContextBuilder.build();
+      this.jwtCustomizer.customize(jwtContext);
+    }
 
-		JoseHeader headers = headersBuilder.build();
-		JwtClaimsSet claims = claimsBuilder.build();
+    JoseHeader headers = headersBuilder.build();
+    JwtClaimsSet claims = claimsBuilder.build();
 
-		Jwt jwt = this.jwtEncoder.encode(headers, claims);
+    Jwt jwt = this.jwtEncoder.encode(headers, claims);
 
-		return jwt;
-	}
+    return jwt;
+  }
 
-	/**
-	 * Sets the {@link OAuth2TokenCustomizer} that customizes the
-	 * {@link JwtEncodingContext#getHeaders() headers} and/or
-	 * {@link JwtEncodingContext#getClaims() claims} for the generated {@link Jwt}.
-	 *
-	 * @param jwtCustomizer the {@link OAuth2TokenCustomizer} that customizes the headers and/or claims for the generated {@code Jwt}
-	 */
-	public void setJwtCustomizer(OAuth2TokenCustomizer<JwtEncodingContext> jwtCustomizer) {
-		Assert.notNull(jwtCustomizer, "jwtCustomizer cannot be null");
-		this.jwtCustomizer = jwtCustomizer;
-	}
-
+  /**
+   * Sets the {@link OAuth2TokenCustomizer} that customizes the {@link
+   * JwtEncodingContext#getHeaders() headers} and/or {@link JwtEncodingContext#getClaims() claims}
+   * for the generated {@link Jwt}.
+   *
+   * @param jwtCustomizer the {@link OAuth2TokenCustomizer} that customizes the headers and/or
+   *     claims for the generated {@code Jwt}
+   */
+  public void setJwtCustomizer(OAuth2TokenCustomizer<JwtEncodingContext> jwtCustomizer) {
+    Assert.notNull(jwtCustomizer, "jwtCustomizer cannot be null");
+    this.jwtCustomizer = jwtCustomizer;
+  }
 }

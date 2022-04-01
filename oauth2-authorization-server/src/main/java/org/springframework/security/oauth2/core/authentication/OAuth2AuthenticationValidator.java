@@ -19,8 +19,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 
 /**
- * Implementations of this interface are responsible for validating the attribute(s)
- * of the {@link Authentication} associated to the {@link OAuth2AuthenticationContext}.
+ * Implementations of this interface are responsible for validating the attribute(s) of the {@link
+ * Authentication} associated to the {@link OAuth2AuthenticationContext}.
  *
  * @author Joe Grandja
  * @since 0.2.0
@@ -29,12 +29,13 @@ import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 @FunctionalInterface
 public interface OAuth2AuthenticationValidator {
 
-	/**
-	 * Validate the attribute(s) of the {@link Authentication}.
-	 *
-	 * @param authenticationContext the authentication context
-	 * @throws OAuth2AuthenticationException if the attribute(s) of the {@code Authentication} is invalid
-	 */
-	void validate(OAuth2AuthenticationContext authenticationContext) throws OAuth2AuthenticationException;
-
+  /**
+   * Validate the attribute(s) of the {@link Authentication}.
+   *
+   * @param authenticationContext the authentication context
+   * @throws OAuth2AuthenticationException if the attribute(s) of the {@code Authentication} is
+   *     invalid
+   */
+  void validate(OAuth2AuthenticationContext authenticationContext)
+      throws OAuth2AuthenticationException;
 }

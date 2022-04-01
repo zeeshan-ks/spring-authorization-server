@@ -15,6 +15,10 @@
  */
 package org.springframework.security.oauth2.server.authorization.jackson2;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -22,13 +26,8 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
-
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests for {@link OAuth2AuthorizationServerJackson2Module}.
@@ -37,38 +36,38 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public class OAuth2AuthorizationServerJackson2ModuleTests {
 
-	private static final TypeReference<Map<String, Object>> STRING_OBJECT_MAP = new TypeReference<Map<String, Object>>() {
-	};
-	private static final TypeReference<Set<String>> STRING_SET = new TypeReference<Set<String>>() {
-	};
+  private static final TypeReference<Map<String, Object>> STRING_OBJECT_MAP =
+      new TypeReference<Map<String, Object>>() {};
+  private static final TypeReference<Set<String>> STRING_SET = new TypeReference<Set<String>>() {};
 
-	private ObjectMapper objectMapper;
+  private ObjectMapper objectMapper;
 
-	@Before
-	public void setup() {
-		this.objectMapper = new ObjectMapper();
-		this.objectMapper.registerModule(new OAuth2AuthorizationServerJackson2Module());
-	}
+  @Before
+  public void setup() {
+    this.objectMapper = new ObjectMapper();
+    this.objectMapper.registerModule(new OAuth2AuthorizationServerJackson2Module());
+  }
 
-	@Test
-	public void readValueWhenUnmodifiableMapThenSuccess() throws Exception {
-		Map<String, Object> map = Collections.unmodifiableMap(new HashMap<>(Collections.singletonMap("key", "value")));
-		String json = this.objectMapper.writeValueAsString(map);
-		assertThat(this.objectMapper.readValue(json, STRING_OBJECT_MAP)).isEqualTo(map);
-	}
+  @Test
+  public void readValueWhenUnmodifiableMapThenSuccess() throws Exception {
+    Map<String, Object> map =
+        Collections.unmodifiableMap(new HashMap<>(Collections.singletonMap("key", "value")));
+    String json = this.objectMapper.writeValueAsString(map);
+    assertThat(this.objectMapper.readValue(json, STRING_OBJECT_MAP)).isEqualTo(map);
+  }
 
-	@Test
-	public void readValueWhenHashSetThenSuccess() throws Exception {
-		Set<String> set = new HashSet<>(Arrays.asList("one", "two"));
-		String json = this.objectMapper.writeValueAsString(set);
-		assertThat(this.objectMapper.readValue(json, STRING_SET)).isEqualTo(set);
-	}
+  @Test
+  public void readValueWhenHashSetThenSuccess() throws Exception {
+    Set<String> set = new HashSet<>(Arrays.asList("one", "two"));
+    String json = this.objectMapper.writeValueAsString(set);
+    assertThat(this.objectMapper.readValue(json, STRING_SET)).isEqualTo(set);
+  }
 
-	// gh-457
-	@Test
-	public void readValueWhenLinkedHashSetThenSuccess() throws Exception {
-		Set<String> set = new LinkedHashSet<>(Arrays.asList("one", "two"));
-		String json = this.objectMapper.writeValueAsString(set);
-		assertThat(this.objectMapper.readValue(json, STRING_SET)).isEqualTo(set);
-	}
+  // gh-457
+  @Test
+  public void readValueWhenLinkedHashSetThenSuccess() throws Exception {
+    Set<String> set = new LinkedHashSet<>(Arrays.asList("one", "two"));
+    String json = this.objectMapper.writeValueAsString(set);
+    assertThat(this.objectMapper.readValue(json, STRING_SET)).isEqualTo(set);
+  }
 }

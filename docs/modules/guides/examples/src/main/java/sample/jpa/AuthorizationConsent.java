@@ -17,91 +17,88 @@ package sample.jpa;
 
 import java.io.Serializable;
 import java.util.Objects;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.IdClass;
 
-/**
- * @author Steve Riesenberg
- */
+/** @author Steve Riesenberg */
 // tag::class[]
 @Entity
 @IdClass(AuthorizationConsent.AuthorizationConsentId.class)
 public class AuthorizationConsent {
-	@Id
-	private String registeredClientId;
-	@Id
-	private String principalName;
-	@Column(length = 1000)
-	private String authorities;
+  @Id private String registeredClientId;
+  @Id private String principalName;
 
-	// getters and setters
-// end::class[]
-	public String getRegisteredClientId() {
-		return registeredClientId;
-	}
+  @Column(length = 1000)
+  private String authorities;
 
-	public void setRegisteredClientId(String registeredClientId) {
-		this.registeredClientId = registeredClientId;
-	}
+  // getters and setters
+  // end::class[]
+  public String getRegisteredClientId() {
+    return registeredClientId;
+  }
 
-	public String getPrincipalName() {
-		return principalName;
-	}
+  public void setRegisteredClientId(String registeredClientId) {
+    this.registeredClientId = registeredClientId;
+  }
 
-	public void setPrincipalName(String principalName) {
-		this.principalName = principalName;
-	}
+  public String getPrincipalName() {
+    return principalName;
+  }
 
-	public String getAuthorities() {
-		return authorities;
-	}
+  public void setPrincipalName(String principalName) {
+    this.principalName = principalName;
+  }
 
-	public void setAuthorities(String authorities) {
-		this.authorities = authorities;
-	}
-// tag::class[]
+  public String getAuthorities() {
+    return authorities;
+  }
 
-	public static class AuthorizationConsentId implements Serializable {
-		private String registeredClientId;
-		private String principalName;
+  public void setAuthorities(String authorities) {
+    this.authorities = authorities;
+  }
+  // tag::class[]
 
-		// getters and setters
-// end::class[]
-		public String getRegisteredClientId() {
-			return registeredClientId;
-		}
+  public static class AuthorizationConsentId implements Serializable {
+    private String registeredClientId;
+    private String principalName;
 
-		public void setRegisteredClientId(String registeredClientId) {
-			this.registeredClientId = registeredClientId;
-		}
+    // getters and setters
+    // end::class[]
+    public String getRegisteredClientId() {
+      return registeredClientId;
+    }
 
-		public String getPrincipalName() {
-			return principalName;
-		}
+    public void setRegisteredClientId(String registeredClientId) {
+      this.registeredClientId = registeredClientId;
+    }
 
-		public void setPrincipalName(String principalName) {
-			this.principalName = principalName;
-		}
-// tag::class[]
+    public String getPrincipalName() {
+      return principalName;
+    }
 
-		// equals and hashCode
-// end::class[]
-		@Override
-		public boolean equals(Object o) {
-			if (this == o) return true;
-			if (o == null || getClass() != o.getClass()) return false;
-			AuthorizationConsentId that = (AuthorizationConsentId) o;
-			return registeredClientId.equals(that.registeredClientId) && principalName.equals(that.principalName);
-		}
+    public void setPrincipalName(String principalName) {
+      this.principalName = principalName;
+    }
+    // tag::class[]
 
-		@Override
-		public int hashCode() {
-			return Objects.hash(registeredClientId, principalName);
-		}
-// tag::class[]
-	}
+    // equals and hashCode
+    // end::class[]
+    @Override
+    public boolean equals(Object o) {
+      if (this == o) return true;
+      if (o == null || getClass() != o.getClass()) return false;
+      AuthorizationConsentId that = (AuthorizationConsentId) o;
+      return registeredClientId.equals(that.registeredClientId)
+          && principalName.equals(that.principalName);
+    }
+
+    @Override
+    public int hashCode() {
+      return Objects.hash(registeredClientId, principalName);
+    }
+    // tag::class[]
+  }
 }
 // end::class[]

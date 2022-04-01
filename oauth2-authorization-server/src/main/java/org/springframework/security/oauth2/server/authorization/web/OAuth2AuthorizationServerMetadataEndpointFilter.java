@@ -18,12 +18,10 @@ package org.springframework.security.oauth2.server.authorization.web;
 import java.io.IOException;
 import java.util.List;
 import java.util.function.Consumer;
-
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.server.ServletServerHttpResponse;
@@ -47,73 +45,76 @@ import org.springframework.web.util.UriComponentsBuilder;
  * @since 0.1.1
  * @see OAuth2AuthorizationServerMetadata
  * @see ProviderSettings
- * @see <a target="_blank" href="https://tools.ietf.org/html/rfc8414#section-3">3. Obtaining Authorization Server Metadata</a>
+ * @see <a target="_blank" href="https://tools.ietf.org/html/rfc8414#section-3">3. Obtaining
+ *     Authorization Server Metadata</a>
  */
 public final class OAuth2AuthorizationServerMetadataEndpointFilter extends OncePerRequestFilter {
-	/**
-	 * The default endpoint {@code URI} for OAuth 2.0 Authorization Server Metadata requests.
-	 */
-	private static final String DEFAULT_OAUTH2_AUTHORIZATION_SERVER_METADATA_ENDPOINT_URI = "/.well-known/oauth-authorization-server";
+  /** The default endpoint {@code URI} for OAuth 2.0 Authorization Server Metadata requests. */
+  private static final String DEFAULT_OAUTH2_AUTHORIZATION_SERVER_METADATA_ENDPOINT_URI =
+      "/.well-known/oauth-authorization-server";
 
-	private final ProviderSettings providerSettings;
-	private final RequestMatcher requestMatcher;
-	private final OAuth2AuthorizationServerMetadataHttpMessageConverter authorizationServerMetadataHttpMessageConverter =
-			new OAuth2AuthorizationServerMetadataHttpMessageConverter();
+  private final ProviderSettings providerSettings;
+  private final RequestMatcher requestMatcher;
+  private final OAuth2AuthorizationServerMetadataHttpMessageConverter
+      authorizationServerMetadataHttpMessageConverter =
+          new OAuth2AuthorizationServerMetadataHttpMessageConverter();
 
-	public OAuth2AuthorizationServerMetadataEndpointFilter(ProviderSettings providerSettings) {
-		Assert.notNull(providerSettings, "providerSettings cannot be null");
-		this.providerSettings = providerSettings;
-		this.requestMatcher = new AntPathRequestMatcher(
-				DEFAULT_OAUTH2_AUTHORIZATION_SERVER_METADATA_ENDPOINT_URI,
-				HttpMethod.GET.name()
-		);
-	}
+  public OAuth2AuthorizationServerMetadataEndpointFilter(ProviderSettings providerSettings) {
+    Assert.notNull(providerSettings, "providerSettings cannot be null");
+    this.providerSettings = providerSettings;
+    this.requestMatcher =
+        new AntPathRequestMatcher(
+            DEFAULT_OAUTH2_AUTHORIZATION_SERVER_METADATA_ENDPOINT_URI, HttpMethod.GET.name());
+  }
 
-	@Override
-	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-			throws ServletException, IOException {
+  @Override
+  protected void doFilterInternal(
+      HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+      throws ServletException, IOException {
 
-		if (!this.requestMatcher.matches(request)) {
-			filterChain.doFilter(request, response);
-			return;
-		}
+    if (!this.requestMatcher.matches(request)) {
+      filterChain.doFilter(request, response);
+      return;
+    }
 
-		String issuer = ProviderContextHolder.getProviderContext().getIssuer();
+    String issuer = ProviderContextHolder.getProviderContext().getIssuer();
 
-		OAuth2AuthorizationServerMetadata authorizationServerMetadata = OAuth2AuthorizationServerMetadata.builder()
-				.issuer(issuer)
-				.authorizationEndpoint(asUrl(issuer, this.providerSettings.getAuthorizationEndpoint()))
-				.tokenEndpoint(asUrl(issuer, this.providerSettings.getTokenEndpoint()))
-				.tokenEndpointAuthenticationMethods(clientAuthenticationMethods())
-				.jwkSetUrl(asUrl(issuer, this.providerSettings.getJwkSetEndpoint()))
-				.responseType(OAuth2AuthorizationResponseType.CODE.getValue())
-				.grantType(AuthorizationGrantType.AUTHORIZATION_CODE.getValue())
-				.grantType(AuthorizationGrantType.CLIENT_CREDENTIALS.getValue())
-				.grantType(AuthorizationGrantType.REFRESH_TOKEN.getValue())
-				.tokenRevocationEndpoint(asUrl(issuer, this.providerSettings.getTokenRevocationEndpoint()))
-				.tokenRevocationEndpointAuthenticationMethods(clientAuthenticationMethods())
-				.tokenIntrospectionEndpoint(asUrl(issuer, this.providerSettings.getTokenIntrospectionEndpoint()))
-				.tokenIntrospectionEndpointAuthenticationMethods(clientAuthenticationMethods())
-				.codeChallengeMethod("plain")
-				.codeChallengeMethod("S256")
-				.build();
+    OAuth2AuthorizationServerMetadata authorizationServerMetadata =
+        OAuth2AuthorizationServerMetadata.builder()
+            .issuer(issuer)
+            .authorizationEndpoint(asUrl(issuer, this.providerSettings.getAuthorizationEndpoint()))
+            .tokenEndpoint(asUrl(issuer, this.providerSettings.getTokenEndpoint()))
+            .tokenEndpointAuthenticationMethods(clientAuthenticationMethods())
+            .jwkSetUrl(asUrl(issuer, this.providerSettings.getJwkSetEndpoint()))
+            .responseType(OAuth2AuthorizationResponseType.CODE.getValue())
+            .grantType(AuthorizationGrantType.AUTHORIZATION_CODE.getValue())
+            .grantType(AuthorizationGrantType.CLIENT_CREDENTIALS.getValue())
+            .grantType(AuthorizationGrantType.REFRESH_TOKEN.getValue())
+            .tokenRevocationEndpoint(
+                asUrl(issuer, this.providerSettings.getTokenRevocationEndpoint()))
+            .tokenRevocationEndpointAuthenticationMethods(clientAuthenticationMethods())
+            .tokenIntrospectionEndpoint(
+                asUrl(issuer, this.providerSettings.getTokenIntrospectionEndpoint()))
+            .tokenIntrospectionEndpointAuthenticationMethods(clientAuthenticationMethods())
+            .codeChallengeMethod("plain")
+            .codeChallengeMethod("S256")
+            .build();
 
-		ServletServerHttpResponse httpResponse = new ServletServerHttpResponse(response);
-		this.authorizationServerMetadataHttpMessageConverter.write(
-				authorizationServerMetadata, MediaType.APPLICATION_JSON, httpResponse);
-	}
+    ServletServerHttpResponse httpResponse = new ServletServerHttpResponse(response);
+    this.authorizationServerMetadataHttpMessageConverter.write(
+        authorizationServerMetadata, MediaType.APPLICATION_JSON, httpResponse);
+  }
 
-	private static Consumer<List<String>> clientAuthenticationMethods() {
-		return (authenticationMethods) -> {
-			authenticationMethods.add(ClientAuthenticationMethod.CLIENT_SECRET_BASIC.getValue());
-			authenticationMethods.add(ClientAuthenticationMethod.CLIENT_SECRET_POST.getValue());
-			authenticationMethods.add(ClientAuthenticationMethod.CLIENT_SECRET_JWT.getValue());
-			authenticationMethods.add(ClientAuthenticationMethod.PRIVATE_KEY_JWT.getValue());
-		};
-	}
+  private static Consumer<List<String>> clientAuthenticationMethods() {
+    return (authenticationMethods) -> {
+      authenticationMethods.add(ClientAuthenticationMethod.CLIENT_SECRET_BASIC.getValue());
+      authenticationMethods.add(ClientAuthenticationMethod.CLIENT_SECRET_POST.getValue());
+      authenticationMethods.add(ClientAuthenticationMethod.CLIENT_SECRET_JWT.getValue());
+      authenticationMethods.add(ClientAuthenticationMethod.PRIVATE_KEY_JWT.getValue());
+    };
+  }
 
-	private static String asUrl(String issuer, String endpoint) {
-		return UriComponentsBuilder.fromUriString(issuer).path(endpoint).toUriString();
-	}
-
+  private static String asUrl(String issuer, String endpoint) {
+    return UriComponentsBuilder.fromUriString(issuer).path(endpoint).toUriString();
+  }
 }

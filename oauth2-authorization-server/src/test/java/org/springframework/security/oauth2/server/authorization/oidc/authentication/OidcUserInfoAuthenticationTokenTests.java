@@ -15,16 +15,14 @@
  */
 package org.springframework.security.oauth2.server.authorization.oidc.authentication;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
+
 import java.util.Collections;
-
 import org.junit.Test;
-
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.oauth2.core.oidc.OidcUserInfo;
 import org.springframework.security.oauth2.core.oidc.StandardClaimNames;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 
 /**
  * Tests for {@link OidcUserInfoAuthenticationToken}.
@@ -33,29 +31,33 @@ import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException
  */
 public class OidcUserInfoAuthenticationTokenTests {
 
-	@Test
-	public void constructorWhenPrincipalNullThenThrowIllegalArgumentException() {
-		assertThatIllegalArgumentException()
-				.isThrownBy(() -> new OidcUserInfoAuthenticationToken(null))
-				.withMessage("principal cannot be null");
-	}
+  @Test
+  public void constructorWhenPrincipalNullThenThrowIllegalArgumentException() {
+    assertThatIllegalArgumentException()
+        .isThrownBy(() -> new OidcUserInfoAuthenticationToken(null))
+        .withMessage("principal cannot be null");
+  }
 
-	@Test
-	public void constructorWhenPrincipalProvidedThenCreated() {
-		UsernamePasswordAuthenticationToken principal = new UsernamePasswordAuthenticationToken(null, null);
-		OidcUserInfoAuthenticationToken authentication = new OidcUserInfoAuthenticationToken(principal);
-		assertThat(authentication.getPrincipal()).isEqualTo(principal);
-		assertThat(authentication.getUserInfo()).isNull();
-		assertThat(authentication.isAuthenticated()).isFalse();
-	}
+  @Test
+  public void constructorWhenPrincipalProvidedThenCreated() {
+    UsernamePasswordAuthenticationToken principal =
+        new UsernamePasswordAuthenticationToken(null, null);
+    OidcUserInfoAuthenticationToken authentication = new OidcUserInfoAuthenticationToken(principal);
+    assertThat(authentication.getPrincipal()).isEqualTo(principal);
+    assertThat(authentication.getUserInfo()).isNull();
+    assertThat(authentication.isAuthenticated()).isFalse();
+  }
 
-	@Test
-	public void constructorWhenPrincipalAndUserInfoProvidedThenCreated() {
-		UsernamePasswordAuthenticationToken principal = new UsernamePasswordAuthenticationToken(null, null);
-		OidcUserInfo userInfo = new OidcUserInfo(Collections.singletonMap(StandardClaimNames.SUB, "user"));
-		OidcUserInfoAuthenticationToken authentication = new OidcUserInfoAuthenticationToken(principal, userInfo);
-		assertThat(authentication.getPrincipal()).isEqualTo(principal);
-		assertThat(authentication.getUserInfo()).isEqualTo(userInfo);
-		assertThat(authentication.isAuthenticated()).isTrue();
-	}
+  @Test
+  public void constructorWhenPrincipalAndUserInfoProvidedThenCreated() {
+    UsernamePasswordAuthenticationToken principal =
+        new UsernamePasswordAuthenticationToken(null, null);
+    OidcUserInfo userInfo =
+        new OidcUserInfo(Collections.singletonMap(StandardClaimNames.SUB, "user"));
+    OidcUserInfoAuthenticationToken authentication =
+        new OidcUserInfoAuthenticationToken(principal, userInfo);
+    assertThat(authentication.getPrincipal()).isEqualTo(principal);
+    assertThat(authentication.getUserInfo()).isEqualTo(userInfo);
+    assertThat(authentication.isAuthenticated()).isTrue();
+  }
 }

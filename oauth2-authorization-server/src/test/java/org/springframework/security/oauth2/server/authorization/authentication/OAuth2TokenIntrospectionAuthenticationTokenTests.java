@@ -15,19 +15,17 @@
  */
 package org.springframework.security.oauth2.server.authorization.authentication;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import java.util.Collections;
 import java.util.Map;
-
 import org.junit.Test;
-
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.oauth2.core.OAuth2TokenIntrospection;
 import org.springframework.security.oauth2.core.OAuth2TokenType;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
 import org.springframework.security.oauth2.server.authorization.client.TestRegisteredClients;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * Tests for {@link OAuth2TokenIntrospectionAuthenticationToken}.
@@ -36,73 +34,96 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  * @author Joe Grandja
  */
 public class OAuth2TokenIntrospectionAuthenticationTokenTests {
-	private String token = "token";
-	private RegisteredClient registeredClient = TestRegisteredClients.registeredClient().build();
-	private OAuth2ClientAuthenticationToken clientPrincipal = new OAuth2ClientAuthenticationToken(
-			this.registeredClient, ClientAuthenticationMethod.CLIENT_SECRET_BASIC, this.registeredClient.getClientSecret());
-	private OAuth2TokenIntrospection tokenClaims = OAuth2TokenIntrospection.builder(true).build();
+  private String token = "token";
+  private RegisteredClient registeredClient = TestRegisteredClients.registeredClient().build();
+  private OAuth2ClientAuthenticationToken clientPrincipal =
+      new OAuth2ClientAuthenticationToken(
+          this.registeredClient,
+          ClientAuthenticationMethod.CLIENT_SECRET_BASIC,
+          this.registeredClient.getClientSecret());
+  private OAuth2TokenIntrospection tokenClaims = OAuth2TokenIntrospection.builder(true).build();
 
-	@Test
-	public void constructorWhenTokenNullThenThrowIllegalArgumentException() {
-		assertThatThrownBy(() -> new OAuth2TokenIntrospectionAuthenticationToken(null, this.clientPrincipal, null, null))
-				.isInstanceOf(IllegalArgumentException.class)
-				.hasMessage("token cannot be empty");
-	}
+  @Test
+  public void constructorWhenTokenNullThenThrowIllegalArgumentException() {
+    assertThatThrownBy(
+            () ->
+                new OAuth2TokenIntrospectionAuthenticationToken(
+                    null, this.clientPrincipal, null, null))
+        .isInstanceOf(IllegalArgumentException.class)
+        .hasMessage("token cannot be empty");
+  }
 
-	@Test
-	public void constructorWhenClientPrincipalNullThenThrowIllegalArgumentException() {
-		assertThatThrownBy(() -> new OAuth2TokenIntrospectionAuthenticationToken(this.token, null, null, null))
-				.isInstanceOf(IllegalArgumentException.class)
-				.hasMessage("clientPrincipal cannot be null");
-	}
+  @Test
+  public void constructorWhenClientPrincipalNullThenThrowIllegalArgumentException() {
+    assertThatThrownBy(
+            () -> new OAuth2TokenIntrospectionAuthenticationToken(this.token, null, null, null))
+        .isInstanceOf(IllegalArgumentException.class)
+        .hasMessage("clientPrincipal cannot be null");
+  }
 
-	@Test
-	public void constructorWhenAuthenticatedAndTokenNullThenThrowIllegalArgumentException() {
-		assertThatThrownBy(() -> new OAuth2TokenIntrospectionAuthenticationToken(null, this.clientPrincipal, this.tokenClaims))
-				.isInstanceOf(IllegalArgumentException.class)
-				.hasMessage("token cannot be empty");
-	}
+  @Test
+  public void constructorWhenAuthenticatedAndTokenNullThenThrowIllegalArgumentException() {
+    assertThatThrownBy(
+            () ->
+                new OAuth2TokenIntrospectionAuthenticationToken(
+                    null, this.clientPrincipal, this.tokenClaims))
+        .isInstanceOf(IllegalArgumentException.class)
+        .hasMessage("token cannot be empty");
+  }
 
-	@Test
-	public void constructorWhenAuthenticatedAndClientPrincipalNullThenThrowIllegalArgumentException() {
-		assertThatThrownBy(() -> new OAuth2TokenIntrospectionAuthenticationToken(this.token, null, this.tokenClaims))
-				.isInstanceOf(IllegalArgumentException.class)
-				.hasMessage("clientPrincipal cannot be null");
-	}
+  @Test
+  public void
+      constructorWhenAuthenticatedAndClientPrincipalNullThenThrowIllegalArgumentException() {
+    assertThatThrownBy(
+            () ->
+                new OAuth2TokenIntrospectionAuthenticationToken(this.token, null, this.tokenClaims))
+        .isInstanceOf(IllegalArgumentException.class)
+        .hasMessage("clientPrincipal cannot be null");
+  }
 
-	@Test
-	public void constructorWhenAuthenticatedAndTokenClaimsNullThenThrowIllegalArgumentException() {
-		assertThatThrownBy(() -> new OAuth2TokenIntrospectionAuthenticationToken(this.token, this.clientPrincipal, null))
-				.isInstanceOf(IllegalArgumentException.class)
-				.hasMessage("tokenClaims cannot be null");
-	}
+  @Test
+  public void constructorWhenAuthenticatedAndTokenClaimsNullThenThrowIllegalArgumentException() {
+    assertThatThrownBy(
+            () ->
+                new OAuth2TokenIntrospectionAuthenticationToken(
+                    this.token, this.clientPrincipal, null))
+        .isInstanceOf(IllegalArgumentException.class)
+        .hasMessage("tokenClaims cannot be null");
+  }
 
-	@Test
-	public void constructorWhenTokenProvidedThenCreated() {
-		Map<String, Object> additionalParameters = Collections.singletonMap("custom-param", "custom-value");
-		OAuth2TokenIntrospectionAuthenticationToken authentication = new OAuth2TokenIntrospectionAuthenticationToken(
-				this.token, this.clientPrincipal, OAuth2TokenType.ACCESS_TOKEN.getValue(), additionalParameters);
-		assertThat(authentication.getToken()).isEqualTo(this.token);
-		assertThat(authentication.getPrincipal()).isEqualTo(this.clientPrincipal);
-		assertThat(authentication.getCredentials().toString()).isEmpty();
-		assertThat(authentication.getTokenTypeHint()).isEqualTo(OAuth2TokenType.ACCESS_TOKEN.getValue());
-		assertThat(authentication.getAdditionalParameters()).containsExactlyInAnyOrderEntriesOf(additionalParameters);
-		assertThat(authentication.getTokenClaims()).isNotNull();
-		assertThat(authentication.getTokenClaims().isActive()).isFalse();
-		assertThat(authentication.isAuthenticated()).isFalse();
-	}
+  @Test
+  public void constructorWhenTokenProvidedThenCreated() {
+    Map<String, Object> additionalParameters =
+        Collections.singletonMap("custom-param", "custom-value");
+    OAuth2TokenIntrospectionAuthenticationToken authentication =
+        new OAuth2TokenIntrospectionAuthenticationToken(
+            this.token,
+            this.clientPrincipal,
+            OAuth2TokenType.ACCESS_TOKEN.getValue(),
+            additionalParameters);
+    assertThat(authentication.getToken()).isEqualTo(this.token);
+    assertThat(authentication.getPrincipal()).isEqualTo(this.clientPrincipal);
+    assertThat(authentication.getCredentials().toString()).isEmpty();
+    assertThat(authentication.getTokenTypeHint())
+        .isEqualTo(OAuth2TokenType.ACCESS_TOKEN.getValue());
+    assertThat(authentication.getAdditionalParameters())
+        .containsExactlyInAnyOrderEntriesOf(additionalParameters);
+    assertThat(authentication.getTokenClaims()).isNotNull();
+    assertThat(authentication.getTokenClaims().isActive()).isFalse();
+    assertThat(authentication.isAuthenticated()).isFalse();
+  }
 
-	@Test
-	public void constructorWhenTokenClaimsProvidedThenCreated() {
-		OAuth2TokenIntrospectionAuthenticationToken authentication = new OAuth2TokenIntrospectionAuthenticationToken(
-				this.token, this.clientPrincipal, this.tokenClaims);
-		assertThat(authentication.getToken()).isEqualTo(this.token);
-		assertThat(authentication.getPrincipal()).isEqualTo(this.clientPrincipal);
-		assertThat(authentication.getCredentials().toString()).isEmpty();
-		assertThat(authentication.getTokenTypeHint()).isNull();
-		assertThat(authentication.getAdditionalParameters()).isEmpty();
-		assertThat(authentication.getTokenClaims()).isEqualTo(this.tokenClaims);
-		assertThat(authentication.isAuthenticated()).isTrue();
-	}
-
+  @Test
+  public void constructorWhenTokenClaimsProvidedThenCreated() {
+    OAuth2TokenIntrospectionAuthenticationToken authentication =
+        new OAuth2TokenIntrospectionAuthenticationToken(
+            this.token, this.clientPrincipal, this.tokenClaims);
+    assertThat(authentication.getToken()).isEqualTo(this.token);
+    assertThat(authentication.getPrincipal()).isEqualTo(this.clientPrincipal);
+    assertThat(authentication.getCredentials().toString()).isEmpty();
+    assertThat(authentication.getTokenTypeHint()).isNull();
+    assertThat(authentication.getAdditionalParameters()).isEmpty();
+    assertThat(authentication.getTokenClaims()).isEqualTo(this.tokenClaims);
+    assertThat(authentication.isAuthenticated()).isTrue();
+  }
 }

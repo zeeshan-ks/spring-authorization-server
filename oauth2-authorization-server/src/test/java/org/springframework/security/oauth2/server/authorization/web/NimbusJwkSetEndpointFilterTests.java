@@ -15,12 +15,12 @@
  */
 package org.springframework.security.oauth2.server.authorization.web;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.servlet.FilterChain;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 import com.nimbusds.jose.jwk.ECKey;
 import com.nimbusds.jose.jwk.JWK;
@@ -30,20 +30,17 @@ import com.nimbusds.jose.jwk.OctetSequenceKey;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
+import java.util.ArrayList;
+import java.util.List;
+import javax.servlet.FilterChain;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.junit.Before;
 import org.junit.Test;
-
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.oauth2.jose.TestJwks;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 
 /**
  * Tests for {@link NimbusJwkSetEndpointFilter}.
@@ -51,111 +48,111 @@ import static org.mockito.Mockito.verifyNoInteractions;
  * @author Joe Grandja
  */
 public class NimbusJwkSetEndpointFilterTests {
-	private static final String DEFAULT_JWK_SET_ENDPOINT_URI = "/oauth2/jwks";
-	private List<JWK> jwkList;
-	private JWKSource<SecurityContext> jwkSource;
-	private NimbusJwkSetEndpointFilter filter;
+  private static final String DEFAULT_JWK_SET_ENDPOINT_URI = "/oauth2/jwks";
+  private List<JWK> jwkList;
+  private JWKSource<SecurityContext> jwkSource;
+  private NimbusJwkSetEndpointFilter filter;
 
-	@Before
-	public void setUp() {
-		this.jwkList = new ArrayList<>();
-		this.jwkSource = (jwkSelector, securityContext) -> jwkSelector.select(new JWKSet(this.jwkList));
-		this.filter = new NimbusJwkSetEndpointFilter(this.jwkSource);
-	}
+  @Before
+  public void setUp() {
+    this.jwkList = new ArrayList<>();
+    this.jwkSource = (jwkSelector, securityContext) -> jwkSelector.select(new JWKSet(this.jwkList));
+    this.filter = new NimbusJwkSetEndpointFilter(this.jwkSource);
+  }
 
-	@Test
-	public void constructorWhenJwkSourceNullThenThrowIllegalArgumentException() {
-		assertThatThrownBy(() -> new NimbusJwkSetEndpointFilter(null))
-				.isInstanceOf(IllegalArgumentException.class)
-				.hasMessage("jwkSource cannot be null");
-	}
+  @Test
+  public void constructorWhenJwkSourceNullThenThrowIllegalArgumentException() {
+    assertThatThrownBy(() -> new NimbusJwkSetEndpointFilter(null))
+        .isInstanceOf(IllegalArgumentException.class)
+        .hasMessage("jwkSource cannot be null");
+  }
 
-	@Test
-	public void constructorWhenJwkSetEndpointUriNullThenThrowIllegalArgumentException() {
-		assertThatThrownBy(() -> new NimbusJwkSetEndpointFilter(this.jwkSource, null))
-				.isInstanceOf(IllegalArgumentException.class)
-				.hasMessage("jwkSetEndpointUri cannot be empty");
-	}
+  @Test
+  public void constructorWhenJwkSetEndpointUriNullThenThrowIllegalArgumentException() {
+    assertThatThrownBy(() -> new NimbusJwkSetEndpointFilter(this.jwkSource, null))
+        .isInstanceOf(IllegalArgumentException.class)
+        .hasMessage("jwkSetEndpointUri cannot be empty");
+  }
 
-	@Test
-	public void doFilterWhenNotJwkSetRequestThenNotProcessed() throws Exception {
-		String requestUri = "/path";
-		MockHttpServletRequest request = new MockHttpServletRequest("GET", requestUri);
-		request.setServletPath(requestUri);
-		MockHttpServletResponse response = new MockHttpServletResponse();
-		FilterChain filterChain = mock(FilterChain.class);
+  @Test
+  public void doFilterWhenNotJwkSetRequestThenNotProcessed() throws Exception {
+    String requestUri = "/path";
+    MockHttpServletRequest request = new MockHttpServletRequest("GET", requestUri);
+    request.setServletPath(requestUri);
+    MockHttpServletResponse response = new MockHttpServletResponse();
+    FilterChain filterChain = mock(FilterChain.class);
 
-		this.filter.doFilter(request, response, filterChain);
+    this.filter.doFilter(request, response, filterChain);
 
-		verify(filterChain).doFilter(any(HttpServletRequest.class), any(HttpServletResponse.class));
-	}
+    verify(filterChain).doFilter(any(HttpServletRequest.class), any(HttpServletResponse.class));
+  }
 
-	@Test
-	public void doFilterWhenJwkSetRequestPostThenNotProcessed() throws Exception {
-		String requestUri = DEFAULT_JWK_SET_ENDPOINT_URI;
-		MockHttpServletRequest request = new MockHttpServletRequest("POST", requestUri);
-		request.setServletPath(requestUri);
-		MockHttpServletResponse response = new MockHttpServletResponse();
-		FilterChain filterChain = mock(FilterChain.class);
+  @Test
+  public void doFilterWhenJwkSetRequestPostThenNotProcessed() throws Exception {
+    String requestUri = DEFAULT_JWK_SET_ENDPOINT_URI;
+    MockHttpServletRequest request = new MockHttpServletRequest("POST", requestUri);
+    request.setServletPath(requestUri);
+    MockHttpServletResponse response = new MockHttpServletResponse();
+    FilterChain filterChain = mock(FilterChain.class);
 
-		this.filter.doFilter(request, response, filterChain);
+    this.filter.doFilter(request, response, filterChain);
 
-		verify(filterChain).doFilter(any(HttpServletRequest.class), any(HttpServletResponse.class));
-	}
+    verify(filterChain).doFilter(any(HttpServletRequest.class), any(HttpServletResponse.class));
+  }
 
-	@Test
-	public void doFilterWhenAsymmetricKeysThenJwkSetResponse() throws Exception {
-		RSAKey rsaJwk = TestJwks.DEFAULT_RSA_JWK;
-		this.jwkList.add(rsaJwk);
-		ECKey ecJwk = TestJwks.DEFAULT_EC_JWK;
-		this.jwkList.add(ecJwk);
+  @Test
+  public void doFilterWhenAsymmetricKeysThenJwkSetResponse() throws Exception {
+    RSAKey rsaJwk = TestJwks.DEFAULT_RSA_JWK;
+    this.jwkList.add(rsaJwk);
+    ECKey ecJwk = TestJwks.DEFAULT_EC_JWK;
+    this.jwkList.add(ecJwk);
 
-		String requestUri = DEFAULT_JWK_SET_ENDPOINT_URI;
-		MockHttpServletRequest request = new MockHttpServletRequest("GET", requestUri);
-		request.setServletPath(requestUri);
-		MockHttpServletResponse response = new MockHttpServletResponse();
-		FilterChain filterChain = mock(FilterChain.class);
+    String requestUri = DEFAULT_JWK_SET_ENDPOINT_URI;
+    MockHttpServletRequest request = new MockHttpServletRequest("GET", requestUri);
+    request.setServletPath(requestUri);
+    MockHttpServletResponse response = new MockHttpServletResponse();
+    FilterChain filterChain = mock(FilterChain.class);
 
-		this.filter.doFilter(request, response, filterChain);
+    this.filter.doFilter(request, response, filterChain);
 
-		verifyNoInteractions(filterChain);
+    verifyNoInteractions(filterChain);
 
-		assertThat(response.getContentType()).isEqualTo(MediaType.APPLICATION_JSON_VALUE);
+    assertThat(response.getContentType()).isEqualTo(MediaType.APPLICATION_JSON_VALUE);
 
-		JWKSet jwkSet = JWKSet.parse(response.getContentAsString());
-		assertThat(jwkSet.getKeys()).hasSize(2);
+    JWKSet jwkSet = JWKSet.parse(response.getContentAsString());
+    assertThat(jwkSet.getKeys()).hasSize(2);
 
-		RSAKey rsaJwkResult = (RSAKey) jwkSet.getKeyByKeyId(rsaJwk.getKeyID());
-		assertThat(rsaJwkResult).isNotNull();
-		assertThat(rsaJwkResult.toRSAPublicKey()).isEqualTo(rsaJwk.toRSAPublicKey());
-		assertThat(rsaJwkResult.toRSAPrivateKey()).isNull();
-		assertThat(rsaJwkResult.getKeyUse()).isEqualTo(KeyUse.SIGNATURE);
+    RSAKey rsaJwkResult = (RSAKey) jwkSet.getKeyByKeyId(rsaJwk.getKeyID());
+    assertThat(rsaJwkResult).isNotNull();
+    assertThat(rsaJwkResult.toRSAPublicKey()).isEqualTo(rsaJwk.toRSAPublicKey());
+    assertThat(rsaJwkResult.toRSAPrivateKey()).isNull();
+    assertThat(rsaJwkResult.getKeyUse()).isEqualTo(KeyUse.SIGNATURE);
 
-		ECKey ecJwkResult = (ECKey) jwkSet.getKeyByKeyId(ecJwk.getKeyID());
-		assertThat(ecJwkResult).isNotNull();
-		assertThat(ecJwkResult.toECPublicKey()).isEqualTo(ecJwk.toECPublicKey());
-		assertThat(ecJwkResult.toECPrivateKey()).isNull();
-		assertThat(ecJwkResult.getKeyUse()).isEqualTo(KeyUse.SIGNATURE);
-	}
+    ECKey ecJwkResult = (ECKey) jwkSet.getKeyByKeyId(ecJwk.getKeyID());
+    assertThat(ecJwkResult).isNotNull();
+    assertThat(ecJwkResult.toECPublicKey()).isEqualTo(ecJwk.toECPublicKey());
+    assertThat(ecJwkResult.toECPrivateKey()).isNull();
+    assertThat(ecJwkResult.getKeyUse()).isEqualTo(KeyUse.SIGNATURE);
+  }
 
-	@Test
-	public void doFilterWhenSymmetricKeysThenJwkSetResponseEmpty() throws Exception {
-		OctetSequenceKey secretJwk = TestJwks.DEFAULT_SECRET_JWK;
-		this.jwkList.add(secretJwk);
+  @Test
+  public void doFilterWhenSymmetricKeysThenJwkSetResponseEmpty() throws Exception {
+    OctetSequenceKey secretJwk = TestJwks.DEFAULT_SECRET_JWK;
+    this.jwkList.add(secretJwk);
 
-		String requestUri = DEFAULT_JWK_SET_ENDPOINT_URI;
-		MockHttpServletRequest request = new MockHttpServletRequest("GET", requestUri);
-		request.setServletPath(requestUri);
-		MockHttpServletResponse response = new MockHttpServletResponse();
-		FilterChain filterChain = mock(FilterChain.class);
+    String requestUri = DEFAULT_JWK_SET_ENDPOINT_URI;
+    MockHttpServletRequest request = new MockHttpServletRequest("GET", requestUri);
+    request.setServletPath(requestUri);
+    MockHttpServletResponse response = new MockHttpServletResponse();
+    FilterChain filterChain = mock(FilterChain.class);
 
-		this.filter.doFilter(request, response, filterChain);
+    this.filter.doFilter(request, response, filterChain);
 
-		verifyNoInteractions(filterChain);
+    verifyNoInteractions(filterChain);
 
-		assertThat(response.getContentType()).isEqualTo(MediaType.APPLICATION_JSON_VALUE);
+    assertThat(response.getContentType()).isEqualTo(MediaType.APPLICATION_JSON_VALUE);
 
-		JWKSet jwkSet = JWKSet.parse(response.getContentAsString());
-		assertThat(jwkSet.getKeys()).isEmpty();
-	}
+    JWKSet jwkSet = JWKSet.parse(response.getContentAsString());
+    assertThat(jwkSet.getKeys()).isEmpty();
+  }
 }

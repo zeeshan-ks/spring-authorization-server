@@ -16,21 +16,18 @@
 
 package org.springframework.security.oauth2.server.authorization.jackson2;
 
-import java.util.Collections;
-import java.util.Map;
-
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import java.util.Collections;
+import java.util.Map;
 
 /**
- * TODO
- * This class is a straight copy from Spring Security.
- * It should be consolidated when merging this codebase into Spring Security.
+ * TODO This class is a straight copy from Spring Security. It should be consolidated when merging
+ * this codebase into Spring Security.
  *
- * This mixin class is used to serialize/deserialize
- * {@link Collections#unmodifiableMap(Map)}. It also registers a custom deserializer
- * {@link UnmodifiableMapDeserializer}.
+ * <p>This mixin class is used to serialize/deserialize {@link Collections#unmodifiableMap(Map)}. It
+ * also registers a custom deserializer {@link UnmodifiableMapDeserializer}.
  *
  * @author Joe Grandja
  * @since 5.3
@@ -41,8 +38,6 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 @JsonDeserialize(using = UnmodifiableMapDeserializer.class)
 abstract class UnmodifiableMapMixin {
 
-	@JsonCreator
-	UnmodifiableMapMixin(Map<?, ?> map) {
-	}
-
+  @JsonCreator
+  UnmodifiableMapMixin(Map<?, ?> map) {}
 }

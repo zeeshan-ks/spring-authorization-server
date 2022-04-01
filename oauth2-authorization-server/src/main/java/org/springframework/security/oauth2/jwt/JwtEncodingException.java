@@ -16,33 +16,32 @@
 package org.springframework.security.oauth2.jwt;
 
 /**
- * This exception is thrown when an error occurs
- * while attempting to encode a JSON Web Token (JWT).
+ * This exception is thrown when an error occurs while attempting to encode a JSON Web Token (JWT).
  *
  * @author Joe Grandja
  * @since 0.0.1
- * @deprecated See <a target="_blank" href="https://github.com/spring-projects/spring-authorization-server/issues/596">gh-596</a>
+ * @deprecated See <a target="_blank"
+ *     href="https://github.com/spring-projects/spring-authorization-server/issues/596">gh-596</a>
  */
 @Deprecated
 public class JwtEncodingException extends JwtException {
 
-	/**
-	 * Constructs a {@code JwtEncodingException} using the provided parameters.
-	 *
-	 * @param message the detail message
-	 */
-	public JwtEncodingException(String message) {
-		super(message);
-	}
+  /**
+   * Constructs a {@code JwtEncodingException} using the provided parameters.
+   *
+   * @param message the detail message
+   */
+  public JwtEncodingException(String message) {
+    super(message);
+  }
 
-	/**
-	 * Constructs a {@code JwtEncodingException} using the provided parameters.
-	 *
-	 * @param message the detail message
-	 * @param cause the root cause
-	 */
-	public JwtEncodingException(String message, Throwable cause) {
-		super(message, cause);
-	}
-
+  /**
+   * Constructs a {@code JwtEncodingException} using the provided parameters.
+   *
+   * @param message the detail message
+   * @param cause the root cause
+   */
+  public JwtEncodingException(String message, Throwable cause) {
+    super(message, cause);
+  }
 }

@@ -28,77 +28,55 @@ package org.springframework.security.oauth2.core;
  */
 
 /**
- * The names of the &quot;Introspection Claims&quot; defined by an
- * <a target="_blank" href="https://tools.ietf.org/html/rfc7662#section-2.2">Introspection
- * Response</a>.
+ * The names of the &quot;Introspection Claims&quot; defined by an <a target="_blank"
+ * href="https://tools.ietf.org/html/rfc7662#section-2.2">Introspection Response</a>.
  *
  * @author Josh Cummings
  * @since 5.2
- * @deprecated See <a target="_blank" href="https://github.com/spring-projects/spring-authorization-server/issues/597">gh-597</a>
+ * @deprecated See <a target="_blank"
+ *     href="https://github.com/spring-projects/spring-authorization-server/issues/597">gh-597</a>
  */
 @Deprecated
 public interface OAuth2TokenIntrospectionClaimNames {
 
-	/**
-	 * {@code active} - Indicator whether or not the token is currently active
-	 */
-	String ACTIVE = "active";
+  /** {@code active} - Indicator whether or not the token is currently active */
+  String ACTIVE = "active";
 
-	/**
-	 * {@code scope} - The scopes for the token
-	 */
-	String SCOPE = "scope";
+  /** {@code scope} - The scopes for the token */
+  String SCOPE = "scope";
 
-	/**
-	 * {@code client_id} - The Client identifier for the token
-	 */
-	String CLIENT_ID = "client_id";
+  /** {@code client_id} - The Client identifier for the token */
+  String CLIENT_ID = "client_id";
 
-	/**
-	 * {@code username} - A human-readable identifier for the resource owner that
-	 * authorized the token
-	 */
-	String USERNAME = "username";
+  /**
+   * {@code username} - A human-readable identifier for the resource owner that authorized the token
+   */
+  String USERNAME = "username";
 
-	/**
-	 * {@code token_type} - The type of the token, for example {@code bearer}.
-	 */
-	String TOKEN_TYPE = "token_type";
+  /** {@code token_type} - The type of the token, for example {@code bearer}. */
+  String TOKEN_TYPE = "token_type";
 
-	/**
-	 * {@code exp} - A timestamp indicating when the token expires
-	 */
-	String EXP = "exp";
+  /** {@code exp} - A timestamp indicating when the token expires */
+  String EXP = "exp";
 
-	/**
-	 * {@code iat} - A timestamp indicating when the token was issued
-	 */
-	String IAT = "iat";
+  /** {@code iat} - A timestamp indicating when the token was issued */
+  String IAT = "iat";
 
-	/**
-	 * {@code nbf} - A timestamp indicating when the token is not to be used before
-	 */
-	String NBF = "nbf";
+  /** {@code nbf} - A timestamp indicating when the token is not to be used before */
+  String NBF = "nbf";
 
-	/**
-	 * {@code sub} - Usually a machine-readable identifier of the resource owner who
-	 * authorized the token
-	 */
-	String SUB = "sub";
+  /**
+   * {@code sub} - Usually a machine-readable identifier of the resource owner who authorized the
+   * token
+   */
+  String SUB = "sub";
 
-	/**
-	 * {@code aud} - The intended audience for the token
-	 */
-	String AUD = "aud";
+  /** {@code aud} - The intended audience for the token */
+  String AUD = "aud";
 
-	/**
-	 * {@code iss} - The issuer of the token
-	 */
-	String ISS = "iss";
+  /** {@code iss} - The issuer of the token */
+  String ISS = "iss";
 
-	/**
-	 * {@code jti} - The identifier for the token
-	 */
-	String JTI = "jti";
-
+  /** {@code jti} - The identifier for the token */
+  String JTI = "jti";
 }

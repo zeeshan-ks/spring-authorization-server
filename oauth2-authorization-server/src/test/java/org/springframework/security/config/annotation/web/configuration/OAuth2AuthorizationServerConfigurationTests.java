@@ -15,15 +15,14 @@
  */
 package org.springframework.security.config.annotation.web.configuration;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.lang.reflect.Method;
 import org.junit.Test;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.OrderUtils;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.util.ClassUtils;
-
-import java.lang.reflect.Method;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests for {@link OAuth2AuthorizationServerConfiguration}.
@@ -32,15 +31,14 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public class OAuth2AuthorizationServerConfigurationTests {
 
-	@Test
-	public void assertOrderHighestPrecedence() {
-		Method authorizationServerSecurityFilterChainMethod =
-				ClassUtils.getMethod(
-						OAuth2AuthorizationServerConfiguration.class,
-						"authorizationServerSecurityFilterChain",
-						HttpSecurity.class);
-		Integer order = OrderUtils.getOrder(authorizationServerSecurityFilterChainMethod);
-		assertThat(order).isEqualTo(Ordered.HIGHEST_PRECEDENCE);
-	}
-
+  @Test
+  public void assertOrderHighestPrecedence() {
+    Method authorizationServerSecurityFilterChainMethod =
+        ClassUtils.getMethod(
+            OAuth2AuthorizationServerConfiguration.class,
+            "authorizationServerSecurityFilterChain",
+            HttpSecurity.class);
+    Integer order = OrderUtils.getOrder(authorizationServerSecurityFilterChainMethod);
+    assertThat(order).isEqualTo(Ordered.HIGHEST_PRECEDENCE);
+  }
 }

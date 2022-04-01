@@ -16,12 +16,10 @@
 package org.springframework.security.oauth2.server.authorization.web;
 
 import java.io.IOException;
-
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.security.oauth2.server.authorization.config.ProviderSettings;
 import org.springframework.security.oauth2.server.authorization.context.ProviderContext;
 import org.springframework.security.oauth2.server.authorization.context.ProviderContextHolder;
@@ -31,7 +29,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.UriComponentsBuilder;
 
 /**
- * A {@code Filter} that associates the {@link ProviderContext} to the {@link ProviderContextHolder}.
+ * A {@code Filter} that associates the {@link ProviderContext} to the {@link
+ * ProviderContextHolder}.
  *
  * @author Joe Grandja
  * @since 0.2.2
@@ -40,47 +39,49 @@ import org.springframework.web.util.UriComponentsBuilder;
  * @see ProviderSettings
  */
 public final class ProviderContextFilter extends OncePerRequestFilter {
-	private final ProviderSettings providerSettings;
+  private final ProviderSettings providerSettings;
 
-	/**
-	 * Constructs a {@code ProviderContextFilter} using the provided parameters.
-	 *
-	 * @param providerSettings the provider settings
-	 */
-	public ProviderContextFilter(ProviderSettings providerSettings) {
-		Assert.notNull(providerSettings, "providerSettings cannot be null");
-		this.providerSettings = providerSettings;
-	}
+  /**
+   * Constructs a {@code ProviderContextFilter} using the provided parameters.
+   *
+   * @param providerSettings the provider settings
+   */
+  public ProviderContextFilter(ProviderSettings providerSettings) {
+    Assert.notNull(providerSettings, "providerSettings cannot be null");
+    this.providerSettings = providerSettings;
+  }
 
-	@Override
-	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-			throws ServletException, IOException {
+  @Override
+  protected void doFilterInternal(
+      HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+      throws ServletException, IOException {
 
-		try {
-			ProviderContext providerContext = new ProviderContext(
-					this.providerSettings, () -> resolveIssuer(this.providerSettings, request));
-			ProviderContextHolder.setProviderContext(providerContext);
-			filterChain.doFilter(request, response);
-		} finally {
-			ProviderContextHolder.resetProviderContext();
-		}
-	}
+    try {
+      ProviderContext providerContext =
+          new ProviderContext(
+              this.providerSettings, () -> resolveIssuer(this.providerSettings, request));
+      ProviderContextHolder.setProviderContext(providerContext);
+      filterChain.doFilter(request, response);
+    } finally {
+      ProviderContextHolder.resetProviderContext();
+    }
+  }
 
-	private static String resolveIssuer(ProviderSettings providerSettings, HttpServletRequest request) {
-		return providerSettings.getIssuer() != null ?
-				providerSettings.getIssuer() :
-				getContextPath(request);
-	}
+  private static String resolveIssuer(
+      ProviderSettings providerSettings, HttpServletRequest request) {
+    return providerSettings.getIssuer() != null
+        ? providerSettings.getIssuer()
+        : getContextPath(request);
+  }
 
-	private static String getContextPath(HttpServletRequest request) {
-		// @formatter:off
-		return UriComponentsBuilder.fromHttpUrl(UrlUtils.buildFullRequestUrl(request))
-				.replacePath(request.getContextPath())
-				.replaceQuery(null)
-				.fragment(null)
-				.build()
-				.toUriString();
-		// @formatter:on
-	}
-
+  private static String getContextPath(HttpServletRequest request) {
+    // @formatter:off
+    return UriComponentsBuilder.fromHttpUrl(UrlUtils.buildFullRequestUrl(request))
+        .replacePath(request.getContextPath())
+        .replaceQuery(null)
+        .fragment(null)
+        .build()
+        .toUriString();
+    // @formatter:on
+  }
 }

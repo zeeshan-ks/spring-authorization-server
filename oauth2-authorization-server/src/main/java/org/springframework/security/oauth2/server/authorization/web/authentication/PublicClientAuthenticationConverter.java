@@ -16,9 +16,7 @@
 package org.springframework.security.oauth2.server.authorization.web.authentication;
 
 import java.util.HashMap;
-
 import javax.servlet.http.HttpServletRequest;
-
 import org.springframework.lang.Nullable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
@@ -33,42 +31,46 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 
 /**
- * Attempts to extract the parameters from {@link HttpServletRequest}
- * used for authenticating public clients using Proof Key for Code Exchange (PKCE).
+ * Attempts to extract the parameters from {@link HttpServletRequest} used for authenticating public
+ * clients using Proof Key for Code Exchange (PKCE).
  *
  * @author Joe Grandja
  * @since 0.0.2
  * @see AuthenticationConverter
  * @see OAuth2ClientAuthenticationToken
  * @see OAuth2ClientAuthenticationFilter
- * @see <a target="_blank" href="https://tools.ietf.org/html/rfc7636">Proof Key for Code Exchange by OAuth Public Clients</a>
+ * @see <a target="_blank" href="https://tools.ietf.org/html/rfc7636">Proof Key for Code Exchange by
+ *     OAuth Public Clients</a>
  */
 public final class PublicClientAuthenticationConverter implements AuthenticationConverter {
 
-	@Nullable
-	@Override
-	public Authentication convert(HttpServletRequest request) {
-		if (!OAuth2EndpointUtils.matchesPkceTokenRequest(request)) {
-			return null;
-		}
+  @Nullable
+  @Override
+  public Authentication convert(HttpServletRequest request) {
+    if (!OAuth2EndpointUtils.matchesPkceTokenRequest(request)) {
+      return null;
+    }
 
-		MultiValueMap<String, String> parameters = OAuth2EndpointUtils.getParameters(request);
+    MultiValueMap<String, String> parameters = OAuth2EndpointUtils.getParameters(request);
 
-		// client_id (REQUIRED for public clients)
-		String clientId = parameters.getFirst(OAuth2ParameterNames.CLIENT_ID);
-		if (!StringUtils.hasText(clientId) ||
-				parameters.get(OAuth2ParameterNames.CLIENT_ID).size() != 1) {
-			throw new OAuth2AuthenticationException(OAuth2ErrorCodes.INVALID_REQUEST);
-		}
+    // client_id (REQUIRED for public clients)
+    String clientId = parameters.getFirst(OAuth2ParameterNames.CLIENT_ID);
+    if (!StringUtils.hasText(clientId)
+        || parameters.get(OAuth2ParameterNames.CLIENT_ID).size() != 1) {
+      throw new OAuth2AuthenticationException(OAuth2ErrorCodes.INVALID_REQUEST);
+    }
 
-		// code_verifier (REQUIRED)
-		if (parameters.get(PkceParameterNames.CODE_VERIFIER).size() != 1) {
-			throw new OAuth2AuthenticationException(OAuth2ErrorCodes.INVALID_REQUEST);
-		}
+    // code_verifier (REQUIRED)
+    if (parameters.get(PkceParameterNames.CODE_VERIFIER).size() != 1) {
+      throw new OAuth2AuthenticationException(OAuth2ErrorCodes.INVALID_REQUEST);
+    }
 
-		parameters.remove(OAuth2ParameterNames.CLIENT_ID);
+    parameters.remove(OAuth2ParameterNames.CLIENT_ID);
 
-		return new OAuth2ClientAuthenticationToken(clientId, ClientAuthenticationMethod.NONE, null,
-				new HashMap<>(parameters.toSingleValueMap()));
-	}
+    return new OAuth2ClientAuthenticationToken(
+        clientId,
+        ClientAuthenticationMethod.NONE,
+        null,
+        new HashMap<>(parameters.toSingleValueMap()));
+  }
 }

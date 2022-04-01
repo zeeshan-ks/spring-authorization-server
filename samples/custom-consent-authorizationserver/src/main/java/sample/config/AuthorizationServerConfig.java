@@ -15,14 +15,11 @@
  */
 package sample.config;
 
-import java.util.UUID;
-
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
-import sample.jose.Jwks;
-
+import java.util.UUID;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
@@ -42,6 +39,7 @@ import org.springframework.security.oauth2.server.authorization.config.ClientSet
 import org.springframework.security.oauth2.server.authorization.config.ProviderSettings;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.util.matcher.RequestMatcher;
+import sample.jose.Jwks;
 
 /**
  * @author Joe Grandja
@@ -49,67 +47,63 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
  */
 @Configuration(proxyBeanMethods = false)
 public class AuthorizationServerConfig {
-	private static final String CUSTOM_CONSENT_PAGE_URI = "/oauth2/consent";
+  private static final String CUSTOM_CONSENT_PAGE_URI = "/oauth2/consent";
 
-	@Bean
-	@Order(Ordered.HIGHEST_PRECEDENCE)
-	public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http) throws Exception {
-		OAuth2AuthorizationServerConfigurer<HttpSecurity> authorizationServerConfigurer =
-				new OAuth2AuthorizationServerConfigurer<>();
-		authorizationServerConfigurer
-				.authorizationEndpoint(authorizationEndpoint ->
-						authorizationEndpoint.consentPage(CUSTOM_CONSENT_PAGE_URI));
+  @Bean
+  @Order(Ordered.HIGHEST_PRECEDENCE)
+  public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http)
+      throws Exception {
+    OAuth2AuthorizationServerConfigurer<HttpSecurity> authorizationServerConfigurer =
+        new OAuth2AuthorizationServerConfigurer<>();
+    authorizationServerConfigurer.authorizationEndpoint(
+        authorizationEndpoint -> authorizationEndpoint.consentPage(CUSTOM_CONSENT_PAGE_URI));
 
-		RequestMatcher endpointsMatcher = authorizationServerConfigurer
-				.getEndpointsMatcher();
+    RequestMatcher endpointsMatcher = authorizationServerConfigurer.getEndpointsMatcher();
 
-		http
-			.requestMatcher(endpointsMatcher)
-			.authorizeRequests(authorizeRequests ->
-				authorizeRequests.anyRequest().authenticated()
-			)
-			.csrf(csrf -> csrf.ignoringRequestMatchers(endpointsMatcher))
-			.apply(authorizationServerConfigurer);
-		return http.formLogin(Customizer.withDefaults()).build();
-	}
+    http.requestMatcher(endpointsMatcher)
+        .authorizeRequests(authorizeRequests -> authorizeRequests.anyRequest().authenticated())
+        .csrf(csrf -> csrf.ignoringRequestMatchers(endpointsMatcher))
+        .apply(authorizationServerConfigurer);
+    return http.formLogin(Customizer.withDefaults()).build();
+  }
 
-	// @formatter:off
-	@Bean
-	public RegisteredClientRepository registeredClientRepository() {
-		RegisteredClient registeredClient = RegisteredClient.withId(UUID.randomUUID().toString())
-				.clientId("messaging-client")
-				.clientSecret("{noop}secret")
-				.clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
-				.authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-				.authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
-				.authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
-				.redirectUri("http://127.0.0.1:8080/login/oauth2/code/messaging-client-oidc")
-				.redirectUri("http://127.0.0.1:8080/authorized")
-				.scope(OidcScopes.OPENID)
-				.scope("message.read")
-				.scope("message.write")
-				.clientSettings(ClientSettings.builder().requireAuthorizationConsent(true).build())
-				.build();
-		return new InMemoryRegisteredClientRepository(registeredClient);
-	}
-	// @formatter:on
+  // @formatter:off
+  @Bean
+  public RegisteredClientRepository registeredClientRepository() {
+    RegisteredClient registeredClient =
+        RegisteredClient.withId(UUID.randomUUID().toString())
+            .clientId("messaging-client")
+            .clientSecret("{noop}secret")
+            .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
+            .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+            .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
+            .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
+            .redirectUri("http://127.0.0.1:8080/login/oauth2/code/messaging-client-oidc")
+            .redirectUri("http://127.0.0.1:8080/authorized")
+            .scope(OidcScopes.OPENID)
+            .scope("message.read")
+            .scope("message.write")
+            .clientSettings(ClientSettings.builder().requireAuthorizationConsent(true).build())
+            .build();
+    return new InMemoryRegisteredClientRepository(registeredClient);
+  }
+  // @formatter:on
 
-	@Bean
-	public JWKSource<SecurityContext> jwkSource() {
-		RSAKey rsaKey = Jwks.generateRsa();
-		JWKSet jwkSet = new JWKSet(rsaKey);
-		return (jwkSelector, securityContext) -> jwkSelector.select(jwkSet);
-	}
+  @Bean
+  public JWKSource<SecurityContext> jwkSource() {
+    RSAKey rsaKey = Jwks.generateRsa();
+    JWKSet jwkSet = new JWKSet(rsaKey);
+    return (jwkSelector, securityContext) -> jwkSelector.select(jwkSet);
+  }
 
-	@Bean
-	public ProviderSettings providerSettings() {
-		return ProviderSettings.builder().issuer("http://localhost:9000").build();
-	}
+  @Bean
+  public ProviderSettings providerSettings() {
+    return ProviderSettings.builder().issuer("http://localhost:9000").build();
+  }
 
-	@Bean
-	public OAuth2AuthorizationConsentService authorizationConsentService() {
-		// Will be used by the ConsentController
-		return new InMemoryOAuth2AuthorizationConsentService();
-	}
-
+  @Bean
+  public OAuth2AuthorizationConsentService authorizationConsentService() {
+    // Will be used by the ConsentController
+    return new InMemoryOAuth2AuthorizationConsentService();
+  }
 }

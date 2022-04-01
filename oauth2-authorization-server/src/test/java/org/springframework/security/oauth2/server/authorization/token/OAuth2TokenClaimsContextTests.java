@@ -15,13 +15,14 @@
  */
 package org.springframework.security.oauth2.server.authorization.token;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import java.security.Principal;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Collections;
-
 import org.junit.Test;
-
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
@@ -37,9 +38,6 @@ import org.springframework.security.oauth2.server.authorization.client.TestRegis
 import org.springframework.security.oauth2.server.authorization.config.ProviderSettings;
 import org.springframework.security.oauth2.server.authorization.context.ProviderContext;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
 /**
  * Tests for {@link OAuth2TokenClaimsContext}.
  *
@@ -47,67 +45,74 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  */
 public class OAuth2TokenClaimsContextTests {
 
-	@Test
-	public void withWhenClaimsNullThenThrowIllegalArgumentException() {
-		assertThatThrownBy(() -> OAuth2TokenClaimsContext.with(null))
-				.isInstanceOf(IllegalArgumentException.class)
-				.hasMessage("claimsBuilder cannot be null");
-	}
+  @Test
+  public void withWhenClaimsNullThenThrowIllegalArgumentException() {
+    assertThatThrownBy(() -> OAuth2TokenClaimsContext.with(null))
+        .isInstanceOf(IllegalArgumentException.class)
+        .hasMessage("claimsBuilder cannot be null");
+  }
 
-	@Test
-	public void buildWhenAllValuesProvidedThenAllValuesAreSet() {
-		String issuer = "https://provider.com";
-		Instant issuedAt = Instant.now();
-		Instant expiresAt = issuedAt.plus(1, ChronoUnit.HOURS);
+  @Test
+  public void buildWhenAllValuesProvidedThenAllValuesAreSet() {
+    String issuer = "https://provider.com";
+    Instant issuedAt = Instant.now();
+    Instant expiresAt = issuedAt.plus(1, ChronoUnit.HOURS);
 
-		// @formatter:off
-		OAuth2TokenClaimsSet.Builder claims = OAuth2TokenClaimsSet.builder()
-				.issuer(issuer)
-				.subject("subject")
-				.audience(Collections.singletonList("client-1"))
-				.issuedAt(issuedAt)
-				.notBefore(issuedAt)
-				.expiresAt(expiresAt)
-				.id("id");
-		// @formatter:on
+    // @formatter:off
+    OAuth2TokenClaimsSet.Builder claims =
+        OAuth2TokenClaimsSet.builder()
+            .issuer(issuer)
+            .subject("subject")
+            .audience(Collections.singletonList("client-1"))
+            .issuedAt(issuedAt)
+            .notBefore(issuedAt)
+            .expiresAt(expiresAt)
+            .id("id");
+    // @formatter:on
 
-		RegisteredClient registeredClient = TestRegisteredClients.registeredClient().build();
-		OAuth2Authorization authorization = TestOAuth2Authorizations.authorization(registeredClient).build();
-		Authentication principal = authorization.getAttribute(Principal.class.getName());
-		ProviderSettings providerSettings = ProviderSettings.builder().issuer(issuer).build();
-		ProviderContext providerContext = new ProviderContext(providerSettings, null);
-		OAuth2ClientAuthenticationToken clientPrincipal = new OAuth2ClientAuthenticationToken(
-				registeredClient, ClientAuthenticationMethod.CLIENT_SECRET_BASIC, registeredClient.getClientSecret());
-		OAuth2AuthorizationRequest authorizationRequest = authorization.getAttribute(
-				OAuth2AuthorizationRequest.class.getName());
-		OAuth2AuthorizationCodeAuthenticationToken authorizationGrant =
-				new OAuth2AuthorizationCodeAuthenticationToken(
-						"code", clientPrincipal, authorizationRequest.getRedirectUri(), null);
+    RegisteredClient registeredClient = TestRegisteredClients.registeredClient().build();
+    OAuth2Authorization authorization =
+        TestOAuth2Authorizations.authorization(registeredClient).build();
+    Authentication principal = authorization.getAttribute(Principal.class.getName());
+    ProviderSettings providerSettings = ProviderSettings.builder().issuer(issuer).build();
+    ProviderContext providerContext = new ProviderContext(providerSettings, null);
+    OAuth2ClientAuthenticationToken clientPrincipal =
+        new OAuth2ClientAuthenticationToken(
+            registeredClient,
+            ClientAuthenticationMethod.CLIENT_SECRET_BASIC,
+            registeredClient.getClientSecret());
+    OAuth2AuthorizationRequest authorizationRequest =
+        authorization.getAttribute(OAuth2AuthorizationRequest.class.getName());
+    OAuth2AuthorizationCodeAuthenticationToken authorizationGrant =
+        new OAuth2AuthorizationCodeAuthenticationToken(
+            "code", clientPrincipal, authorizationRequest.getRedirectUri(), null);
 
-		// @formatter:off
-		OAuth2TokenClaimsContext context = OAuth2TokenClaimsContext.with(claims)
-				.registeredClient(registeredClient)
-				.principal(principal)
-				.providerContext(providerContext)
-				.authorization(authorization)
-				.tokenType(OAuth2TokenType.ACCESS_TOKEN)
-				.authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-				.authorizationGrant(authorizationGrant)
-				.put("custom-key-1", "custom-value-1")
-				.context(ctx -> ctx.put("custom-key-2", "custom-value-2"))
-				.build();
-		// @formatter:on
+    // @formatter:off
+    OAuth2TokenClaimsContext context =
+        OAuth2TokenClaimsContext.with(claims)
+            .registeredClient(registeredClient)
+            .principal(principal)
+            .providerContext(providerContext)
+            .authorization(authorization)
+            .tokenType(OAuth2TokenType.ACCESS_TOKEN)
+            .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+            .authorizationGrant(authorizationGrant)
+            .put("custom-key-1", "custom-value-1")
+            .context(ctx -> ctx.put("custom-key-2", "custom-value-2"))
+            .build();
+    // @formatter:on
 
-		assertThat(context.getClaims()).isEqualTo(claims);
-		assertThat(context.getRegisteredClient()).isEqualTo(registeredClient);
-		assertThat(context.<Authentication>getPrincipal()).isEqualTo(principal);
-		assertThat(context.getProviderContext()).isEqualTo(providerContext);
-		assertThat(context.getAuthorization()).isEqualTo(authorization);
-		assertThat(context.getTokenType()).isEqualTo(OAuth2TokenType.ACCESS_TOKEN);
-		assertThat(context.getAuthorizationGrantType()).isEqualTo(AuthorizationGrantType.AUTHORIZATION_CODE);
-		assertThat(context.<OAuth2AuthorizationGrantAuthenticationToken>getAuthorizationGrant()).isEqualTo(authorizationGrant);
-		assertThat(context.<String>get("custom-key-1")).isEqualTo("custom-value-1");
-		assertThat(context.<String>get("custom-key-2")).isEqualTo("custom-value-2");
-	}
-
+    assertThat(context.getClaims()).isEqualTo(claims);
+    assertThat(context.getRegisteredClient()).isEqualTo(registeredClient);
+    assertThat(context.<Authentication>getPrincipal()).isEqualTo(principal);
+    assertThat(context.getProviderContext()).isEqualTo(providerContext);
+    assertThat(context.getAuthorization()).isEqualTo(authorization);
+    assertThat(context.getTokenType()).isEqualTo(OAuth2TokenType.ACCESS_TOKEN);
+    assertThat(context.getAuthorizationGrantType())
+        .isEqualTo(AuthorizationGrantType.AUTHORIZATION_CODE);
+    assertThat(context.<OAuth2AuthorizationGrantAuthenticationToken>getAuthorizationGrant())
+        .isEqualTo(authorizationGrant);
+    assertThat(context.<String>get("custom-key-1")).isEqualTo("custom-value-1");
+    assertThat(context.<String>get("custom-key-2")).isEqualTo("custom-value-2");
+  }
 }

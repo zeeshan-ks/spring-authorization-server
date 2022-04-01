@@ -18,7 +18,8 @@ package org.springframework.security.oauth2.server.authorization.context;
 import org.springframework.security.oauth2.server.authorization.web.ProviderContextFilter;
 
 /**
- * A holder of {@link ProviderContext} that associates it with the current thread using a {@code ThreadLocal}.
+ * A holder of {@link ProviderContext} that associates it with the current thread using a {@code
+ * ThreadLocal}.
  *
  * @author Joe Grandja
  * @since 0.2.2
@@ -26,38 +27,34 @@ import org.springframework.security.oauth2.server.authorization.web.ProviderCont
  * @see ProviderContextFilter
  */
 public final class ProviderContextHolder {
-	private static final ThreadLocal<ProviderContext> holder = new ThreadLocal<>();
+  private static final ThreadLocal<ProviderContext> holder = new ThreadLocal<>();
 
-	private ProviderContextHolder() {
-	}
+  private ProviderContextHolder() {}
 
-	/**
-	 * Returns the {@link ProviderContext} bound to the current thread.
-	 *
-	 * @return the {@link ProviderContext}
-	 */
-	public static ProviderContext getProviderContext() {
-		return holder.get();
-	}
+  /**
+   * Returns the {@link ProviderContext} bound to the current thread.
+   *
+   * @return the {@link ProviderContext}
+   */
+  public static ProviderContext getProviderContext() {
+    return holder.get();
+  }
 
-	/**
-	 * Bind the given {@link ProviderContext} to the current thread.
-	 *
-	 * @param providerContext the {@link ProviderContext}
-	 */
-	public static void setProviderContext(ProviderContext providerContext) {
-		if (providerContext == null) {
-			resetProviderContext();
-		} else {
-			holder.set(providerContext);
-		}
-	}
+  /**
+   * Bind the given {@link ProviderContext} to the current thread.
+   *
+   * @param providerContext the {@link ProviderContext}
+   */
+  public static void setProviderContext(ProviderContext providerContext) {
+    if (providerContext == null) {
+      resetProviderContext();
+    } else {
+      holder.set(providerContext);
+    }
+  }
 
-	/**
-	 * Reset the {@link ProviderContext} bound to the current thread.
-	 */
-	public static void resetProviderContext() {
-		holder.remove();
-	}
-
+  /** Reset the {@link ProviderContext} bound to the current thread. */
+  public static void resetProviderContext() {
+    holder.remove();
+  }
 }

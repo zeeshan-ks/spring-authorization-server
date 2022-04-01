@@ -41,63 +41,66 @@ import org.springframework.util.Assert;
  * @see OAuth2AuthorizationService
  */
 public final class PublicClientAuthenticationProvider implements AuthenticationProvider {
-	private static final String ERROR_URI = "https://datatracker.ietf.org/doc/html/rfc6749#section-3.2.1";
-	private final RegisteredClientRepository registeredClientRepository;
-	private final CodeVerifierAuthenticator codeVerifierAuthenticator;
+  private static final String ERROR_URI =
+      "https://datatracker.ietf.org/doc/html/rfc6749#section-3.2.1";
+  private final RegisteredClientRepository registeredClientRepository;
+  private final CodeVerifierAuthenticator codeVerifierAuthenticator;
 
-	/**
-	 * Constructs a {@code PublicClientAuthenticationProvider} using the provided parameters.
-	 *
-	 * @param registeredClientRepository the repository of registered clients
-	 * @param authorizationService the authorization service
-	 */
-	public PublicClientAuthenticationProvider(RegisteredClientRepository registeredClientRepository,
-			OAuth2AuthorizationService authorizationService) {
-		Assert.notNull(registeredClientRepository, "registeredClientRepository cannot be null");
-		Assert.notNull(authorizationService, "authorizationService cannot be null");
-		this.registeredClientRepository = registeredClientRepository;
-		this.codeVerifierAuthenticator = new CodeVerifierAuthenticator(authorizationService);
-	}
+  /**
+   * Constructs a {@code PublicClientAuthenticationProvider} using the provided parameters.
+   *
+   * @param registeredClientRepository the repository of registered clients
+   * @param authorizationService the authorization service
+   */
+  public PublicClientAuthenticationProvider(
+      RegisteredClientRepository registeredClientRepository,
+      OAuth2AuthorizationService authorizationService) {
+    Assert.notNull(registeredClientRepository, "registeredClientRepository cannot be null");
+    Assert.notNull(authorizationService, "authorizationService cannot be null");
+    this.registeredClientRepository = registeredClientRepository;
+    this.codeVerifierAuthenticator = new CodeVerifierAuthenticator(authorizationService);
+  }
 
-	@Override
-	public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-		OAuth2ClientAuthenticationToken clientAuthentication =
-				(OAuth2ClientAuthenticationToken) authentication;
+  @Override
+  public Authentication authenticate(Authentication authentication) throws AuthenticationException {
+    OAuth2ClientAuthenticationToken clientAuthentication =
+        (OAuth2ClientAuthenticationToken) authentication;
 
-		if (!ClientAuthenticationMethod.NONE.equals(clientAuthentication.getClientAuthenticationMethod())) {
-			return null;
-		}
+    if (!ClientAuthenticationMethod.NONE.equals(
+        clientAuthentication.getClientAuthenticationMethod())) {
+      return null;
+    }
 
-		String clientId = clientAuthentication.getPrincipal().toString();
-		RegisteredClient registeredClient = this.registeredClientRepository.findByClientId(clientId);
-		if (registeredClient == null) {
-			throwInvalidClient(OAuth2ParameterNames.CLIENT_ID);
-		}
+    String clientId = clientAuthentication.getPrincipal().toString();
+    RegisteredClient registeredClient = this.registeredClientRepository.findByClientId(clientId);
+    if (registeredClient == null) {
+      throwInvalidClient(OAuth2ParameterNames.CLIENT_ID);
+    }
 
-		if (!registeredClient.getClientAuthenticationMethods().contains(
-				clientAuthentication.getClientAuthenticationMethod())) {
-			throwInvalidClient("authentication_method");
-		}
+    if (!registeredClient
+        .getClientAuthenticationMethods()
+        .contains(clientAuthentication.getClientAuthenticationMethod())) {
+      throwInvalidClient("authentication_method");
+    }
 
-		// Validate the "code_verifier" parameter for the public client
-		this.codeVerifierAuthenticator.authenticateRequired(clientAuthentication, registeredClient);
+    // Validate the "code_verifier" parameter for the public client
+    this.codeVerifierAuthenticator.authenticateRequired(clientAuthentication, registeredClient);
 
-		return new OAuth2ClientAuthenticationToken(registeredClient,
-				clientAuthentication.getClientAuthenticationMethod(), null);
-	}
+    return new OAuth2ClientAuthenticationToken(
+        registeredClient, clientAuthentication.getClientAuthenticationMethod(), null);
+  }
 
-	@Override
-	public boolean supports(Class<?> authentication) {
-		return OAuth2ClientAuthenticationToken.class.isAssignableFrom(authentication);
-	}
+  @Override
+  public boolean supports(Class<?> authentication) {
+    return OAuth2ClientAuthenticationToken.class.isAssignableFrom(authentication);
+  }
 
-	private static void throwInvalidClient(String parameterName) {
-		OAuth2Error error = new OAuth2Error(
-				OAuth2ErrorCodes.INVALID_CLIENT,
-				"Client authentication failed: " + parameterName,
-				ERROR_URI
-		);
-		throw new OAuth2AuthenticationException(error);
-	}
-
+  private static void throwInvalidClient(String parameterName) {
+    OAuth2Error error =
+        new OAuth2Error(
+            OAuth2ErrorCodes.INVALID_CLIENT,
+            "Client authentication failed: " + parameterName,
+            ERROR_URI);
+    throw new OAuth2AuthenticationException(error);
+  }
 }

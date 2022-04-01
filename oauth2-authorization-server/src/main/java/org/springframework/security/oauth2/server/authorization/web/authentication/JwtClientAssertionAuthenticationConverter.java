@@ -16,9 +16,7 @@
 package org.springframework.security.oauth2.server.authorization.web.authentication;
 
 import java.util.Map;
-
 import javax.servlet.http.HttpServletRequest;
-
 import org.springframework.lang.Nullable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
@@ -32,8 +30,8 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 
 /**
- * Attempts to extract a JWT client assertion credential from {@link HttpServletRequest}
- * and then converts to an {@link OAuth2ClientAuthenticationToken} used for authenticating the client.
+ * Attempts to extract a JWT client assertion credential from {@link HttpServletRequest} and then
+ * converts to an {@link OAuth2ClientAuthenticationToken} used for authenticating the client.
  *
  * @author Rafal Lewczuk
  * @since 0.2.2
@@ -42,48 +40,49 @@ import org.springframework.util.StringUtils;
  * @see OAuth2ClientAuthenticationFilter
  */
 public final class JwtClientAssertionAuthenticationConverter implements AuthenticationConverter {
-	private static final ClientAuthenticationMethod JWT_CLIENT_ASSERTION_AUTHENTICATION_METHOD =
-			new ClientAuthenticationMethod("urn:ietf:params:oauth:client-assertion-type:jwt-bearer");
+  private static final ClientAuthenticationMethod JWT_CLIENT_ASSERTION_AUTHENTICATION_METHOD =
+      new ClientAuthenticationMethod("urn:ietf:params:oauth:client-assertion-type:jwt-bearer");
 
-	@Nullable
-	@Override
-	public Authentication convert(HttpServletRequest request) {
-		if (request.getParameter(OAuth2ParameterNames.CLIENT_ASSERTION_TYPE) == null ||
-				request.getParameter(OAuth2ParameterNames.CLIENT_ASSERTION) == null) {
-			return null;
-		}
+  @Nullable
+  @Override
+  public Authentication convert(HttpServletRequest request) {
+    if (request.getParameter(OAuth2ParameterNames.CLIENT_ASSERTION_TYPE) == null
+        || request.getParameter(OAuth2ParameterNames.CLIENT_ASSERTION) == null) {
+      return null;
+    }
 
-		MultiValueMap<String, String> parameters = OAuth2EndpointUtils.getParameters(request);
+    MultiValueMap<String, String> parameters = OAuth2EndpointUtils.getParameters(request);
 
-		// client_assertion_type (REQUIRED)
-		String clientAssertionType = parameters.getFirst(OAuth2ParameterNames.CLIENT_ASSERTION_TYPE);
-		if (parameters.get(OAuth2ParameterNames.CLIENT_ASSERTION_TYPE).size() != 1) {
-			throw new OAuth2AuthenticationException(OAuth2ErrorCodes.INVALID_REQUEST);
-		}
-		if (!JWT_CLIENT_ASSERTION_AUTHENTICATION_METHOD.getValue().equals(clientAssertionType)) {
-			return null;
-		}
+    // client_assertion_type (REQUIRED)
+    String clientAssertionType = parameters.getFirst(OAuth2ParameterNames.CLIENT_ASSERTION_TYPE);
+    if (parameters.get(OAuth2ParameterNames.CLIENT_ASSERTION_TYPE).size() != 1) {
+      throw new OAuth2AuthenticationException(OAuth2ErrorCodes.INVALID_REQUEST);
+    }
+    if (!JWT_CLIENT_ASSERTION_AUTHENTICATION_METHOD.getValue().equals(clientAssertionType)) {
+      return null;
+    }
 
-		// client_assertion (REQUIRED)
-		String jwtAssertion = parameters.getFirst(OAuth2ParameterNames.CLIENT_ASSERTION);
-		if (parameters.get(OAuth2ParameterNames.CLIENT_ASSERTION).size() != 1) {
-			throw new OAuth2AuthenticationException(OAuth2ErrorCodes.INVALID_REQUEST);
-		}
+    // client_assertion (REQUIRED)
+    String jwtAssertion = parameters.getFirst(OAuth2ParameterNames.CLIENT_ASSERTION);
+    if (parameters.get(OAuth2ParameterNames.CLIENT_ASSERTION).size() != 1) {
+      throw new OAuth2AuthenticationException(OAuth2ErrorCodes.INVALID_REQUEST);
+    }
 
-		// client_id (OPTIONAL as per specification but REQUIRED by this implementation)
-		String clientId = parameters.getFirst(OAuth2ParameterNames.CLIENT_ID);
-		if (!StringUtils.hasText(clientId) ||
-				parameters.get(OAuth2ParameterNames.CLIENT_ID).size() != 1) {
-			throw new OAuth2AuthenticationException(OAuth2ErrorCodes.INVALID_REQUEST);
-		}
+    // client_id (OPTIONAL as per specification but REQUIRED by this implementation)
+    String clientId = parameters.getFirst(OAuth2ParameterNames.CLIENT_ID);
+    if (!StringUtils.hasText(clientId)
+        || parameters.get(OAuth2ParameterNames.CLIENT_ID).size() != 1) {
+      throw new OAuth2AuthenticationException(OAuth2ErrorCodes.INVALID_REQUEST);
+    }
 
-		Map<String, Object> additionalParameters = OAuth2EndpointUtils.getParametersIfMatchesAuthorizationCodeGrantRequest(request,
-				OAuth2ParameterNames.CLIENT_ASSERTION_TYPE,
-				OAuth2ParameterNames.CLIENT_ASSERTION,
-				OAuth2ParameterNames.CLIENT_ID);
+    Map<String, Object> additionalParameters =
+        OAuth2EndpointUtils.getParametersIfMatchesAuthorizationCodeGrantRequest(
+            request,
+            OAuth2ParameterNames.CLIENT_ASSERTION_TYPE,
+            OAuth2ParameterNames.CLIENT_ASSERTION,
+            OAuth2ParameterNames.CLIENT_ID);
 
-		return new OAuth2ClientAuthenticationToken(clientId, JWT_CLIENT_ASSERTION_AUTHENTICATION_METHOD,
-				jwtAssertion, additionalParameters);
-	}
-
+    return new OAuth2ClientAuthenticationToken(
+        clientId, JWT_CLIENT_ASSERTION_AUTHENTICATION_METHOD, jwtAssertion, additionalParameters);
+  }
 }

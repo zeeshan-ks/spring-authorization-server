@@ -18,14 +18,11 @@ package sample;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-/**
- * @author Daniel Garnier-Moiroux
- */
+/** @author Daniel Garnier-Moiroux */
 @SpringBootApplication
 public class CustomConsentAuthorizationServerApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(CustomConsentAuthorizationServerApplication.class, args);
-	}
-
+  public static void main(String[] args) {
+    SpringApplication.run(CustomConsentAuthorizationServerApplication.class, args);
+  }
 }

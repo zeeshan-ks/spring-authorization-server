@@ -16,9 +16,7 @@
 package org.springframework.security.oauth2.server.authorization.web;
 
 import java.util.Map;
-
 import javax.servlet.http.HttpServletRequest;
-
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
@@ -30,20 +28,19 @@ import org.springframework.util.MultiValueMap;
  */
 final class OAuth2EndpointUtils {
 
-	private OAuth2EndpointUtils() {
-	}
+  private OAuth2EndpointUtils() {}
 
-	static MultiValueMap<String, String> getParameters(HttpServletRequest request) {
-		Map<String, String[]> parameterMap = request.getParameterMap();
-		MultiValueMap<String, String> parameters = new LinkedMultiValueMap<>(parameterMap.size());
-		parameterMap.forEach((key, values) -> {
-			if (values.length > 0) {
-				for (String value : values) {
-					parameters.add(key, value);
-				}
-			}
-		});
-		return parameters;
-	}
-
+  static MultiValueMap<String, String> getParameters(HttpServletRequest request) {
+    Map<String, String[]> parameterMap = request.getParameterMap();
+    MultiValueMap<String, String> parameters = new LinkedMultiValueMap<>(parameterMap.size());
+    parameterMap.forEach(
+        (key, values) -> {
+          if (values.length > 0) {
+            for (String value : values) {
+              parameters.add(key, value);
+            }
+          }
+        });
+    return parameters;
+  }
 }

@@ -15,15 +15,13 @@
  */
 package org.springframework.security.oauth2.server.authorization;
 
-import java.util.List;
-
-import org.junit.Before;
-import org.junit.Test;
-
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
+
+import java.util.List;
+import org.junit.Before;
+import org.junit.Test;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 /**
  * Tests for {@link InMemoryOAuth2AuthorizationConsentService}.
@@ -31,118 +29,132 @@ import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException
  * @author Daniel Garnier-Moiroux
  */
 public class InMemoryOAuth2AuthorizationConsentServiceTests {
-	private static final String REGISTERED_CLIENT_ID = "registered-client-id";
-	private static final String PRINCIPAL_NAME = "principal-name";
-	private static final OAuth2AuthorizationConsent AUTHORIZATION_CONSENT =
-			OAuth2AuthorizationConsent.withId(REGISTERED_CLIENT_ID, PRINCIPAL_NAME)
-					.authority(new SimpleGrantedAuthority("some.authority"))
-					.build();
+  private static final String REGISTERED_CLIENT_ID = "registered-client-id";
+  private static final String PRINCIPAL_NAME = "principal-name";
+  private static final OAuth2AuthorizationConsent AUTHORIZATION_CONSENT =
+      OAuth2AuthorizationConsent.withId(REGISTERED_CLIENT_ID, PRINCIPAL_NAME)
+          .authority(new SimpleGrantedAuthority("some.authority"))
+          .build();
 
-	private InMemoryOAuth2AuthorizationConsentService authorizationConsentService;
+  private InMemoryOAuth2AuthorizationConsentService authorizationConsentService;
 
-	@Before
-	public void setUp() {
-		this.authorizationConsentService = new InMemoryOAuth2AuthorizationConsentService();
-		this.authorizationConsentService.save(AUTHORIZATION_CONSENT);
-	}
+  @Before
+  public void setUp() {
+    this.authorizationConsentService = new InMemoryOAuth2AuthorizationConsentService();
+    this.authorizationConsentService.save(AUTHORIZATION_CONSENT);
+  }
 
-	@Test
-	public void constructorVarargsWhenAuthorizationConsentNullThenThrowIllegalArgumentException() {
-		assertThatIllegalArgumentException()
-				.isThrownBy(() -> new InMemoryOAuth2AuthorizationConsentService((OAuth2AuthorizationConsent) null))
-				.withMessage("authorizationConsent cannot be null");
-	}
+  @Test
+  public void constructorVarargsWhenAuthorizationConsentNullThenThrowIllegalArgumentException() {
+    assertThatIllegalArgumentException()
+        .isThrownBy(
+            () -> new InMemoryOAuth2AuthorizationConsentService((OAuth2AuthorizationConsent) null))
+        .withMessage("authorizationConsent cannot be null");
+  }
 
-	@Test
-	public void constructorListWhenAuthorizationConsentsNullThenThrowIllegalArgumentException() {
-		assertThatIllegalArgumentException()
-				.isThrownBy(() -> new InMemoryOAuth2AuthorizationConsentService((List<OAuth2AuthorizationConsent>) null))
-				.withMessage("authorizationConsents cannot be null");
-	}
+  @Test
+  public void constructorListWhenAuthorizationConsentsNullThenThrowIllegalArgumentException() {
+    assertThatIllegalArgumentException()
+        .isThrownBy(
+            () ->
+                new InMemoryOAuth2AuthorizationConsentService(
+                    (List<OAuth2AuthorizationConsent>) null))
+        .withMessage("authorizationConsents cannot be null");
+  }
 
-	@Test
-	public void constructorWhenDuplicateAuthorizationConsentsThenThrowIllegalArgumentException() {
-		assertThatIllegalArgumentException()
-				.isThrownBy(() -> new InMemoryOAuth2AuthorizationConsentService(AUTHORIZATION_CONSENT, AUTHORIZATION_CONSENT))
-				.withMessage("The authorizationConsent must be unique. Found duplicate, with registered client id: [registered-client-id] and principal name: [principal-name]");
-	}
+  @Test
+  public void constructorWhenDuplicateAuthorizationConsentsThenThrowIllegalArgumentException() {
+    assertThatIllegalArgumentException()
+        .isThrownBy(
+            () ->
+                new InMemoryOAuth2AuthorizationConsentService(
+                    AUTHORIZATION_CONSENT, AUTHORIZATION_CONSENT))
+        .withMessage(
+            "The authorizationConsent must be unique. Found duplicate, with registered client id:"
+                + " [registered-client-id] and principal name: [principal-name]");
+  }
 
-	@Test
-	public void saveWhenAuthorizationConsentNullThenThrowIllegalArgumentException() {
-		assertThatIllegalArgumentException()
-				.isThrownBy(() -> this.authorizationConsentService.save(null))
-				.withMessage("authorizationConsent cannot be null");
-	}
+  @Test
+  public void saveWhenAuthorizationConsentNullThenThrowIllegalArgumentException() {
+    assertThatIllegalArgumentException()
+        .isThrownBy(() -> this.authorizationConsentService.save(null))
+        .withMessage("authorizationConsent cannot be null");
+  }
 
-	@Test
-	public void saveWhenAuthorizationConsentNewThenSaved() {
-		OAuth2AuthorizationConsent expectedAuthorizationConsent =
-				OAuth2AuthorizationConsent.withId("new-client", "new-principal")
-						.authority(new SimpleGrantedAuthority("new.authority"))
-						.build();
+  @Test
+  public void saveWhenAuthorizationConsentNewThenSaved() {
+    OAuth2AuthorizationConsent expectedAuthorizationConsent =
+        OAuth2AuthorizationConsent.withId("new-client", "new-principal")
+            .authority(new SimpleGrantedAuthority("new.authority"))
+            .build();
 
-		this.authorizationConsentService.save(expectedAuthorizationConsent);
+    this.authorizationConsentService.save(expectedAuthorizationConsent);
 
-		OAuth2AuthorizationConsent authorizationConsent =
-				this.authorizationConsentService.findById("new-client", "new-principal");
-		assertThat(authorizationConsent).isEqualTo(expectedAuthorizationConsent);
-	}
+    OAuth2AuthorizationConsent authorizationConsent =
+        this.authorizationConsentService.findById("new-client", "new-principal");
+    assertThat(authorizationConsent).isEqualTo(expectedAuthorizationConsent);
+  }
 
-	@Test
-	public void saveWhenAuthorizationConsentExistsThenUpdated() {
-		OAuth2AuthorizationConsent expectedAuthorizationConsent =
-				OAuth2AuthorizationConsent.from(AUTHORIZATION_CONSENT)
-						.authority(new SimpleGrantedAuthority("new.authority"))
-						.build();
+  @Test
+  public void saveWhenAuthorizationConsentExistsThenUpdated() {
+    OAuth2AuthorizationConsent expectedAuthorizationConsent =
+        OAuth2AuthorizationConsent.from(AUTHORIZATION_CONSENT)
+            .authority(new SimpleGrantedAuthority("new.authority"))
+            .build();
 
-		this.authorizationConsentService.save(expectedAuthorizationConsent);
+    this.authorizationConsentService.save(expectedAuthorizationConsent);
 
-		OAuth2AuthorizationConsent authorizationConsent =
-				this.authorizationConsentService.findById(
-						AUTHORIZATION_CONSENT.getRegisteredClientId(), AUTHORIZATION_CONSENT.getPrincipalName());
-		assertThat(authorizationConsent).isEqualTo(expectedAuthorizationConsent);
-		assertThat(authorizationConsent).isNotEqualTo(AUTHORIZATION_CONSENT);
-	}
+    OAuth2AuthorizationConsent authorizationConsent =
+        this.authorizationConsentService.findById(
+            AUTHORIZATION_CONSENT.getRegisteredClientId(),
+            AUTHORIZATION_CONSENT.getPrincipalName());
+    assertThat(authorizationConsent).isEqualTo(expectedAuthorizationConsent);
+    assertThat(authorizationConsent).isNotEqualTo(AUTHORIZATION_CONSENT);
+  }
 
-	@Test
-	public void removeWhenAuthorizationConsentNullThenThrowIllegalArgumentException() {
-		assertThatIllegalArgumentException()
-				.isThrownBy(() -> this.authorizationConsentService.remove(null))
-				.withMessage("authorizationConsent cannot be null");
-	}
+  @Test
+  public void removeWhenAuthorizationConsentNullThenThrowIllegalArgumentException() {
+    assertThatIllegalArgumentException()
+        .isThrownBy(() -> this.authorizationConsentService.remove(null))
+        .withMessage("authorizationConsent cannot be null");
+  }
 
-	@Test
-	public void removeWhenAuthorizationConsentProvidedThenRemoved() {
-		this.authorizationConsentService.remove(AUTHORIZATION_CONSENT);
-		assertThat(this.authorizationConsentService.findById(
-				AUTHORIZATION_CONSENT.getRegisteredClientId(), AUTHORIZATION_CONSENT.getPrincipalName()))
-				.isNull();
-	}
+  @Test
+  public void removeWhenAuthorizationConsentProvidedThenRemoved() {
+    this.authorizationConsentService.remove(AUTHORIZATION_CONSENT);
+    assertThat(
+            this.authorizationConsentService.findById(
+                AUTHORIZATION_CONSENT.getRegisteredClientId(),
+                AUTHORIZATION_CONSENT.getPrincipalName()))
+        .isNull();
+  }
 
-	@Test
-	public void findByIdWhenRegisteredClientIdNullThenThrowIllegalArgumentException() {
-		assertThatIllegalArgumentException()
-				.isThrownBy(() -> this.authorizationConsentService.findById(null, "some-user"))
-				.withMessage("registeredClientId cannot be empty");
-	}
+  @Test
+  public void findByIdWhenRegisteredClientIdNullThenThrowIllegalArgumentException() {
+    assertThatIllegalArgumentException()
+        .isThrownBy(() -> this.authorizationConsentService.findById(null, "some-user"))
+        .withMessage("registeredClientId cannot be empty");
+  }
 
-	@Test
-	public void findByIdWhenPrincipalNameNullThenThrowIllegalArgumentException() {
-		assertThatIllegalArgumentException()
-				.isThrownBy(() -> this.authorizationConsentService.findById("some-client", null))
-				.withMessage("principalName cannot be empty");
-	}
+  @Test
+  public void findByIdWhenPrincipalNameNullThenThrowIllegalArgumentException() {
+    assertThatIllegalArgumentException()
+        .isThrownBy(() -> this.authorizationConsentService.findById("some-client", null))
+        .withMessage("principalName cannot be empty");
+  }
 
-	@Test
-	public void findByIdWhenAuthorizationConsentExistsThenFound() {
-		assertThat(this.authorizationConsentService.findById(REGISTERED_CLIENT_ID, PRINCIPAL_NAME))
-				.isEqualTo(AUTHORIZATION_CONSENT);
-	}
+  @Test
+  public void findByIdWhenAuthorizationConsentExistsThenFound() {
+    assertThat(this.authorizationConsentService.findById(REGISTERED_CLIENT_ID, PRINCIPAL_NAME))
+        .isEqualTo(AUTHORIZATION_CONSENT);
+  }
 
-	@Test
-	public void findByIdWhenAuthorizationConsentDoesNotExistThenNull() {
-		this.authorizationConsentService.save(AUTHORIZATION_CONSENT);
-		assertThat(this.authorizationConsentService.findById("unknown-client", PRINCIPAL_NAME)).isNull();
-		assertThat(this.authorizationConsentService.findById(REGISTERED_CLIENT_ID, "unknown-user")).isNull();
-	}
+  @Test
+  public void findByIdWhenAuthorizationConsentDoesNotExistThenNull() {
+    this.authorizationConsentService.save(AUTHORIZATION_CONSENT);
+    assertThat(this.authorizationConsentService.findById("unknown-client", PRINCIPAL_NAME))
+        .isNull();
+    assertThat(this.authorizationConsentService.findById(REGISTERED_CLIENT_ID, "unknown-user"))
+        .isNull();
+  }
 }

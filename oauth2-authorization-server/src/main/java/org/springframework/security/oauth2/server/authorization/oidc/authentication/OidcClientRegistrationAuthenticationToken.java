@@ -16,7 +16,6 @@
 package org.springframework.security.oauth2.server.authorization.oidc.authentication;
 
 import java.util.Collections;
-
 import org.springframework.lang.Nullable;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -25,7 +24,8 @@ import org.springframework.security.oauth2.core.oidc.OidcClientRegistration;
 import org.springframework.util.Assert;
 
 /**
- * An {@link Authentication} implementation used for OpenID Connect 1.0 Dynamic Client Registration (and Configuration) Endpoint.
+ * An {@link Authentication} implementation used for OpenID Connect 1.0 Dynamic Client Registration
+ * (and Configuration) Endpoint.
  *
  * @author Joe Grandja
  * @author Ovidiu Popa
@@ -35,72 +35,72 @@ import org.springframework.util.Assert;
  * @see OidcClientRegistrationAuthenticationProvider
  */
 public class OidcClientRegistrationAuthenticationToken extends AbstractAuthenticationToken {
-	private static final long serialVersionUID = Version.SERIAL_VERSION_UID;
-	private final Authentication principal;
-	private final OidcClientRegistration clientRegistration;
-	private final String clientId;
+  private static final long serialVersionUID = Version.SERIAL_VERSION_UID;
+  private final Authentication principal;
+  private final OidcClientRegistration clientRegistration;
+  private final String clientId;
 
-	/**
-	 * Constructs an {@code OidcClientRegistrationAuthenticationToken} using the provided parameters.
-	 *
-	 * @param principal the authenticated principal
-	 * @param clientRegistration the client registration
-	 */
-	public OidcClientRegistrationAuthenticationToken(Authentication principal, OidcClientRegistration clientRegistration) {
-		super(Collections.emptyList());
-		Assert.notNull(principal, "principal cannot be null");
-		Assert.notNull(clientRegistration, "clientRegistration cannot be null");
-		this.principal = principal;
-		this.clientRegistration = clientRegistration;
-		this.clientId = null;
-		setAuthenticated(principal.isAuthenticated());
-	}
+  /**
+   * Constructs an {@code OidcClientRegistrationAuthenticationToken} using the provided parameters.
+   *
+   * @param principal the authenticated principal
+   * @param clientRegistration the client registration
+   */
+  public OidcClientRegistrationAuthenticationToken(
+      Authentication principal, OidcClientRegistration clientRegistration) {
+    super(Collections.emptyList());
+    Assert.notNull(principal, "principal cannot be null");
+    Assert.notNull(clientRegistration, "clientRegistration cannot be null");
+    this.principal = principal;
+    this.clientRegistration = clientRegistration;
+    this.clientId = null;
+    setAuthenticated(principal.isAuthenticated());
+  }
 
-	/**
-	 * Constructs an {@code OidcClientRegistrationAuthenticationToken} using the provided parameters.
-	 *
-	 * @param principal the authenticated principal
-	 * @param clientId the client identifier
-	 * @since 0.2.1
-	 */
-	public OidcClientRegistrationAuthenticationToken(Authentication principal, String clientId) {
-		super(Collections.emptyList());
-		Assert.notNull(principal, "principal cannot be null");
-		Assert.hasText(clientId, "clientId cannot be empty");
-		this.principal = principal;
-		this.clientRegistration = null;
-		this.clientId = clientId;
-		setAuthenticated(principal.isAuthenticated());
-	}
+  /**
+   * Constructs an {@code OidcClientRegistrationAuthenticationToken} using the provided parameters.
+   *
+   * @param principal the authenticated principal
+   * @param clientId the client identifier
+   * @since 0.2.1
+   */
+  public OidcClientRegistrationAuthenticationToken(Authentication principal, String clientId) {
+    super(Collections.emptyList());
+    Assert.notNull(principal, "principal cannot be null");
+    Assert.hasText(clientId, "clientId cannot be empty");
+    this.principal = principal;
+    this.clientRegistration = null;
+    this.clientId = clientId;
+    setAuthenticated(principal.isAuthenticated());
+  }
 
-	@Override
-	public Object getPrincipal() {
-		return this.principal;
-	}
+  @Override
+  public Object getPrincipal() {
+    return this.principal;
+  }
 
-	@Override
-	public Object getCredentials() {
-		return "";
-	}
+  @Override
+  public Object getCredentials() {
+    return "";
+  }
 
-	/**
-	 * Returns the client registration.
-	 *
-	 * @return the client registration
-	 */
-	public OidcClientRegistration getClientRegistration() {
-		return this.clientRegistration;
-	}
+  /**
+   * Returns the client registration.
+   *
+   * @return the client registration
+   */
+  public OidcClientRegistration getClientRegistration() {
+    return this.clientRegistration;
+  }
 
-	/**
-	 * Returns the client identifier.
-	 *
-	 * @return the client identifier
-	 * @since 0.2.1
-	 */
-	@Nullable
-	public String getClientId() {
-		return this.clientId;
-	}
-
+  /**
+   * Returns the client identifier.
+   *
+   * @return the client identifier
+   * @since 0.2.1
+   */
+  @Nullable
+  public String getClientId() {
+    return this.clientId;
+  }
 }

@@ -18,42 +18,38 @@ package org.springframework.security.oauth2.jwt;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-
 import org.springframework.security.oauth2.jose.jws.SignatureAlgorithm;
 
-/**
- * @author Joe Grandja
- */
+/** @author Joe Grandja */
 public final class TestJoseHeaders {
 
-	private TestJoseHeaders() {
-	}
+  private TestJoseHeaders() {}
 
-	public static JoseHeader.Builder joseHeader() {
-		return joseHeader(SignatureAlgorithm.RS256);
-	}
+  public static JoseHeader.Builder joseHeader() {
+    return joseHeader(SignatureAlgorithm.RS256);
+  }
 
-	public static JoseHeader.Builder joseHeader(SignatureAlgorithm signatureAlgorithm) {
-		// @formatter:off
-		return JoseHeader.withAlgorithm(signatureAlgorithm)
-				.jwkSetUrl("https://provider.com/oauth2/jwks")
-				.jwk(rsaJwk())
-				.keyId("keyId")
-				.x509Url("https://provider.com/oauth2/x509")
-				.x509CertificateChain(Arrays.asList("x509Cert1", "x509Cert2"))
-				.x509SHA1Thumbprint("x509SHA1Thumbprint")
-				.x509SHA256Thumbprint("x509SHA256Thumbprint")
-				.type("JWT")
-				.contentType("jwt-content-type")
-				.header("custom-header-name", "custom-header-value");
-		// @formatter:on
-	}
+  public static JoseHeader.Builder joseHeader(SignatureAlgorithm signatureAlgorithm) {
+    // @formatter:off
+    return JoseHeader.withAlgorithm(signatureAlgorithm)
+        .jwkSetUrl("https://provider.com/oauth2/jwks")
+        .jwk(rsaJwk())
+        .keyId("keyId")
+        .x509Url("https://provider.com/oauth2/x509")
+        .x509CertificateChain(Arrays.asList("x509Cert1", "x509Cert2"))
+        .x509SHA1Thumbprint("x509SHA1Thumbprint")
+        .x509SHA256Thumbprint("x509SHA256Thumbprint")
+        .type("JWT")
+        .contentType("jwt-content-type")
+        .header("custom-header-name", "custom-header-value");
+    // @formatter:on
+  }
 
-	private static Map<String, Object> rsaJwk() {
-		Map<String, Object> rsaJwk = new HashMap<>();
-		rsaJwk.put("kty", "RSA");
-		rsaJwk.put("n", "modulus");
-		rsaJwk.put("e", "exponent");
-		return rsaJwk;
-	}
+  private static Map<String, Object> rsaJwk() {
+    Map<String, Object> rsaJwk = new HashMap<>();
+    rsaJwk.put("kty", "RSA");
+    rsaJwk.put("n", "modulus");
+    rsaJwk.put("e", "exponent");
+    return rsaJwk;
+  }
 }

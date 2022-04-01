@@ -15,8 +15,11 @@
  */
 package org.springframework.security.oauth2.server.authorization.web.authentication;
 
-import org.junit.Test;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.entry;
 
+import org.junit.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
@@ -27,77 +30,78 @@ import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames;
 import org.springframework.security.oauth2.core.endpoint.PkceParameterNames;
 import org.springframework.security.oauth2.server.authorization.authentication.OAuth2ClientAuthenticationToken;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.api.Assertions.entry;
-
 /**
  * Tests for {@link PublicClientAuthenticationConverter}.
  *
  * @author Joe Grandja
  */
 public class PublicClientAuthenticationConverterTests {
-	private PublicClientAuthenticationConverter converter = new PublicClientAuthenticationConverter();
+  private PublicClientAuthenticationConverter converter = new PublicClientAuthenticationConverter();
 
-	@Test
-	public void convertWhenNotPublicClientThenReturnNull() {
-		MockHttpServletRequest request = new MockHttpServletRequest();
-		Authentication authentication = this.converter.convert(request);
-		assertThat(authentication).isNull();
-	}
+  @Test
+  public void convertWhenNotPublicClientThenReturnNull() {
+    MockHttpServletRequest request = new MockHttpServletRequest();
+    Authentication authentication = this.converter.convert(request);
+    assertThat(authentication).isNull();
+  }
 
-	@Test
-	public void convertWhenMissingClientIdThenInvalidRequestError() {
-		MockHttpServletRequest request = createPkceTokenRequest();
-		request.removeParameter(OAuth2ParameterNames.CLIENT_ID);
-		assertThatThrownBy(() -> this.converter.convert(request))
-				.isInstanceOf(OAuth2AuthenticationException.class)
-				.extracting(ex -> ((OAuth2AuthenticationException) ex).getError())
-				.extracting("errorCode")
-				.isEqualTo(OAuth2ErrorCodes.INVALID_REQUEST);
-	}
+  @Test
+  public void convertWhenMissingClientIdThenInvalidRequestError() {
+    MockHttpServletRequest request = createPkceTokenRequest();
+    request.removeParameter(OAuth2ParameterNames.CLIENT_ID);
+    assertThatThrownBy(() -> this.converter.convert(request))
+        .isInstanceOf(OAuth2AuthenticationException.class)
+        .extracting(ex -> ((OAuth2AuthenticationException) ex).getError())
+        .extracting("errorCode")
+        .isEqualTo(OAuth2ErrorCodes.INVALID_REQUEST);
+  }
 
-	@Test
-	public void convertWhenMultipleClientIdThenInvalidRequestError() {
-		MockHttpServletRequest request = createPkceTokenRequest();
-		request.addParameter(OAuth2ParameterNames.CLIENT_ID, "client-2");
-		assertThatThrownBy(() -> this.converter.convert(request))
-				.isInstanceOf(OAuth2AuthenticationException.class)
-				.extracting(ex -> ((OAuth2AuthenticationException) ex).getError())
-				.extracting("errorCode")
-				.isEqualTo(OAuth2ErrorCodes.INVALID_REQUEST);
-	}
+  @Test
+  public void convertWhenMultipleClientIdThenInvalidRequestError() {
+    MockHttpServletRequest request = createPkceTokenRequest();
+    request.addParameter(OAuth2ParameterNames.CLIENT_ID, "client-2");
+    assertThatThrownBy(() -> this.converter.convert(request))
+        .isInstanceOf(OAuth2AuthenticationException.class)
+        .extracting(ex -> ((OAuth2AuthenticationException) ex).getError())
+        .extracting("errorCode")
+        .isEqualTo(OAuth2ErrorCodes.INVALID_REQUEST);
+  }
 
-	@Test
-	public void convertWhenMultipleCodeVerifierThenInvalidRequestError() {
-		MockHttpServletRequest request = createPkceTokenRequest();
-		request.addParameter(PkceParameterNames.CODE_VERIFIER, "code-verifier-2");
-		assertThatThrownBy(() -> this.converter.convert(request))
-				.isInstanceOf(OAuth2AuthenticationException.class)
-				.extracting(ex -> ((OAuth2AuthenticationException) ex).getError())
-				.extracting("errorCode")
-				.isEqualTo(OAuth2ErrorCodes.INVALID_REQUEST);
-	}
+  @Test
+  public void convertWhenMultipleCodeVerifierThenInvalidRequestError() {
+    MockHttpServletRequest request = createPkceTokenRequest();
+    request.addParameter(PkceParameterNames.CODE_VERIFIER, "code-verifier-2");
+    assertThatThrownBy(() -> this.converter.convert(request))
+        .isInstanceOf(OAuth2AuthenticationException.class)
+        .extracting(ex -> ((OAuth2AuthenticationException) ex).getError())
+        .extracting("errorCode")
+        .isEqualTo(OAuth2ErrorCodes.INVALID_REQUEST);
+  }
 
-	@Test
-	public void convertWhenPublicClientThenReturnClientAuthenticationToken() {
-		MockHttpServletRequest request = createPkceTokenRequest();
-		OAuth2ClientAuthenticationToken authentication = (OAuth2ClientAuthenticationToken) this.converter.convert(request);
-		assertThat(authentication.getPrincipal()).isEqualTo("client-1");
-		assertThat(authentication.getClientAuthenticationMethod()).isEqualTo(ClientAuthenticationMethod.NONE);
-		assertThat(authentication.getAdditionalParameters())
-				.containsOnly(
-						entry(OAuth2ParameterNames.GRANT_TYPE, AuthorizationGrantType.AUTHORIZATION_CODE.getValue()),
-						entry(OAuth2ParameterNames.CODE, "code"),
-						entry(PkceParameterNames.CODE_VERIFIER, "code-verifier-1"));
-	}
+  @Test
+  public void convertWhenPublicClientThenReturnClientAuthenticationToken() {
+    MockHttpServletRequest request = createPkceTokenRequest();
+    OAuth2ClientAuthenticationToken authentication =
+        (OAuth2ClientAuthenticationToken) this.converter.convert(request);
+    assertThat(authentication.getPrincipal()).isEqualTo("client-1");
+    assertThat(authentication.getClientAuthenticationMethod())
+        .isEqualTo(ClientAuthenticationMethod.NONE);
+    assertThat(authentication.getAdditionalParameters())
+        .containsOnly(
+            entry(
+                OAuth2ParameterNames.GRANT_TYPE,
+                AuthorizationGrantType.AUTHORIZATION_CODE.getValue()),
+            entry(OAuth2ParameterNames.CODE, "code"),
+            entry(PkceParameterNames.CODE_VERIFIER, "code-verifier-1"));
+  }
 
-	private static MockHttpServletRequest createPkceTokenRequest() {
-		MockHttpServletRequest request = new MockHttpServletRequest();
-		request.addParameter(OAuth2ParameterNames.GRANT_TYPE, AuthorizationGrantType.AUTHORIZATION_CODE.getValue());
-		request.addParameter(OAuth2ParameterNames.CODE, "code");
-		request.addParameter(OAuth2ParameterNames.CLIENT_ID, "client-1");
-		request.addParameter(PkceParameterNames.CODE_VERIFIER, "code-verifier-1");
-		return request;
-	}
+  private static MockHttpServletRequest createPkceTokenRequest() {
+    MockHttpServletRequest request = new MockHttpServletRequest();
+    request.addParameter(
+        OAuth2ParameterNames.GRANT_TYPE, AuthorizationGrantType.AUTHORIZATION_CODE.getValue());
+    request.addParameter(OAuth2ParameterNames.CODE, "code");
+    request.addParameter(OAuth2ParameterNames.CLIENT_ID, "client-1");
+    request.addParameter(PkceParameterNames.CODE_VERIFIER, "code-verifier-1");
+    return request;
+  }
 }
